@@ -5,7 +5,9 @@ data class Note(
     val content: String,
     val category: NoteCategory,
     val language: Language,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val extractedData: Map<String, String>,
+    val isRevealed: Boolean = false
 )
 
 enum class NoteCategory {

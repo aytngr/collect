@@ -10,5 +10,6 @@ data class NoteEntity(
     val content: String,
     val category: String,
     val language: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val extractedData: String
 )

@@ -10,8 +10,9 @@ import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import com.example.domain.repository.NotesRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class NotesRepositoryImpl(
+class NotesRepositoryImpl @Inject constructor(
     private val noteDao: NoteDao
 ) : NotesRepository {
     override fun getAllNotes(): Flow<DataResult<List<Note>>> {
@@ -20,12 +21,12 @@ class NotesRepositoryImpl(
         }
     }
 
-    override suspend fun insertNote(note: Note) {
-        handleResponse { noteDao.insertNote(note.toEntity()) }
+    override suspend fun insertNote(note: Note): DataResult<Long> {
+        return handleResponse { noteDao.insertNote(note.toEntity()) }
     }
 
-    override suspend fun deleteNote(note: Note) {
-        handleResponse { noteDao.deleteNote(note.toEntity()) }
+    override suspend fun deleteNote(note: Note): DataResult<Unit> {
+        return handleResponse { noteDao.deleteNote(note.toEntity()) }
     }
 
     override suspend fun updateNote(note: Note){
