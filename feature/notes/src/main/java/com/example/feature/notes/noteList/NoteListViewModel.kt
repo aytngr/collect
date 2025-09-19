@@ -72,7 +72,6 @@ class NoteListViewModel @Inject constructor(
 
     private fun deleteNote(note: Note) {
         viewModelScope.launch {
-            delay(500)
             deleteNoteUseCase(note).onSuccess {
                 sendEffect(NoteListContract.Effect.ShowToast("Note deleted"))
             }.onError {

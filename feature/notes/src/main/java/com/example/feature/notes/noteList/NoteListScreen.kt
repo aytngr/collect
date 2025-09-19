@@ -163,7 +163,7 @@ fun NoteListScreen(
                                 modifier = Modifier.fillMaxHeight()
                             )
                         },
-                        onExpanded = {
+                        onDragStart = {
                             viewModel.handleIntent(
                                 NoteListContract.Intent.HandleExpandedNotes(
                                     note
@@ -342,6 +342,7 @@ fun SwipeableItemWithAction(
     isRevealed: Boolean,
     actions: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
+    onDragStart: () -> Unit = {},
     onExpanded: () -> Unit = {},
     onCollapsed: () -> Unit = {},
     content: @Composable () -> Unit
@@ -407,7 +408,8 @@ fun SwipeableItemWithAction(
                                     }
                                 }
                             }
-                        }
+                        },
+                        onDragStart = {onDragStart()}
                     )
                 }
         ) {

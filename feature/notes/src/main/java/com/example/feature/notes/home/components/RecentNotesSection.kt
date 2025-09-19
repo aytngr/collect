@@ -51,6 +51,7 @@ fun RecentNotesSection(
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(bottom = 8.dp),
             modifier = Modifier.heightIn(max = 300.dp)
         ) {
             items(notes) { note ->
