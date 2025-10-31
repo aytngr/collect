@@ -1,6 +1,9 @@
 package com.example.feature.notes.home
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -9,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +29,8 @@ import com.example.feature.notes.home.components.LanguageSelector
 import com.example.feature.notes.home.components.RecentNotesSection
 import com.example.feature.notes.home.components.StatusSection
 import com.example.feature.notes.home.components.VoiceButton
+import androidx.core.net.toUri
+import com.example.feature.notes.service.OverlayService
 
 @Composable
 fun HomeScreen(onNavigateToNotesList: () -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
@@ -66,10 +72,20 @@ private fun HomeContent(
     state: HomeContract.State,
     onIntent: (HomeContract.Intent) -> Unit
 ) {
+
+    if (!Settings.canDrawOverlays(LocalContext.current)) {
+        val intent = Intent(
+            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            "package:${LocalContext.current.packageName}".toUri()
+        )
+        LocalContext.current.startActivity(intent)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        StartFloatingServiceButton()
         Text(
             text = "Voice Notes",
             style = MaterialTheme.typography.headlineLarge,
@@ -119,5 +135,25 @@ private fun HomeContent(
                 modifier = Modifier.padding(16.dp)
             )
         }
+    }
+}
+
+@Composable
+fun StartFloatingServiceButton() {
+    val context = LocalContext.current.applicationContext
+
+    Button(onClick = {
+        if (Settings.canDrawOverlays(context)) {
+            val intent = Intent(context, OverlayService::class.java)
+            context.startService(intent)
+        } else {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:${context.packageName}")
+            )
+            context.startActivity(intent)
+        }
+    }) {
+        Text("Start Floating Widget")
     }
 }

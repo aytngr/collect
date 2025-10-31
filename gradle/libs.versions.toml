@@ -20,6 +20,8 @@ material = "1.12.0"
 room = "2.7.0-alpha02"
 gson = "2.11.0"
 serialization = "1.7.1"
+lifecycleService = "2.9.4"
+savedstateKtx = "1.3.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +75,8 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
+androidx-savedstate-ktx = { group = "androidx.savedstate", name = "savedstate-ktx", version.ref = "savedstateKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
