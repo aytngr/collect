@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,19 +28,20 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @Composable
 fun FloatingButton(
     windowManager: WindowManager?,
     layoutParams: WindowManager.LayoutParams,
-    view: android.view.View, onClick: () -> Unit
+    view: android.view.View, onClick: () -> Unit, isRightSide: Boolean, saveWidgetLocation: suspend (x: Int, y: Int, isRightSide: Boolean) -> Unit
 ) {
     val density = LocalDensity.current
     val context = LocalContext.current
     var totalHorizontalDrag by remember { mutableFloatStateOf(0f) }
-    var isRightSide by remember { mutableStateOf(true) }
+    var isRightSide by remember { mutableStateOf(isRightSide) }
     var isLongPressDragging by remember { mutableStateOf(false) }
-    var isHorizontalDragging by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope ()
 
     Box(
         modifier = Modifier
@@ -91,21 +93,22 @@ fun FloatingButton(
 
                         windowManager?.updateViewLayout(view, layoutParams)
                         isLongPressDragging = false
+                        coroutineScope.launch {
+                            saveWidgetLocation(layoutParams.x, layoutParams.y, isRightSide)
+                        }
                     },
                     onDragCancel = {
                         isLongPressDragging = false
                     }
                 )
             }
-            .pointerInput(isLongPressDragging, isHorizontalDragging, isRightSide) {
+            .pointerInput(isLongPressDragging, isRightSide) {
                 detectHorizontalDragGestures { _, dragAmount ->
                     if (!isLongPressDragging) {
                         if (isRightSide && dragAmount < -10) {
                             onClick()
-                            isHorizontalDragging = true
                         } else if (!isRightSide && dragAmount > 10) {
                             onClick()
-                            isHorizontalDragging = true
                         }
                     }
                 }

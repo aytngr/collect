@@ -1,8 +1,11 @@
 package com.example.feature.notes.home
 
 import android.Manifest
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -82,10 +85,13 @@ private fun HomeContent(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         StartFloatingServiceButton()
+        BatteryButton()
         Text(
             text = "Voice Notes",
             style = MaterialTheme.typography.headlineLarge,
@@ -155,5 +161,28 @@ fun StartFloatingServiceButton() {
         }
     }) {
         Text("Start Floating Widget")
+    }
+}
+
+@Composable
+fun BatteryButton() {
+    val context = LocalContext.current.applicationContext
+
+    Button(onClick = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
+            if (!powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                }
+                try {
+                    context.startActivity(intent)
+                } catch (e: Exception) {
+                    // Some devices don't support this
+                }
+            }
+        }
+    }) {
+        Text("for battery")
     }
 }

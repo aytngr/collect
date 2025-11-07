@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
@@ -25,32 +26,72 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.example.core.common.base.ScreenshotManager
+import com.example.domain.models.Language
+import com.example.domain.models.SaveStatus
+import com.example.domain.models.onError
+import com.example.domain.models.onSuccess
+import com.example.domain.usecase.CreateNoteUseCase
+import com.example.domain.usecase.GetWidgetLocationUseCase
+import com.example.domain.usecase.SaveWidgetLocationUseCase
+import com.example.feature.notes.ScreenshotActivity
 import com.example.feature.notes.widget.FloatingButton
 import com.example.feature.notes.widget.QuickNotesOverlay
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
     private lateinit var windowManager: WindowManager
     private var widgetView: View? = null
+    private var quickNoteView: View? = null
     var isQuickNoteAdded = false
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val store = ViewModelStore()
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
 
+    @Inject
+    lateinit var saveWidgetLocationUseCase: SaveWidgetLocationUseCase
+
+    @Inject
+    lateinit var getWidgetLocationUseCase: GetWidgetLocationUseCase
+
+    @Inject
+    lateinit var createNoteUseCase: CreateNoteUseCase
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    private var screenshotManager: ScreenshotManager? = null
+    private var capturedScreenshot: Bitmap? = null
+
     companion object {
         private const val CHANNEL_ID = "overlay_service_channel"
         private const val NOTIFICATION_ID = 1
+
+        const val ACTION_SCREENSHOT_PERMISSION_GRANTED = "action_screenshot_permission_granted"
+        const val ACTION_SCREENSHOT_PERMISSION_DENIED = "action_screenshot_permission_denied"
+        const val EXTRA_RESULT_CODE = "extra_result_code"
+        const val EXTRA_RESULT_DATA = "extra_result_data"
     }
+
+
 
     override val lifecycle: Lifecycle
         get() = lifecycleRegistry
@@ -61,11 +102,15 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     override val savedStateRegistry: SavedStateRegistry
         get() = savedStateRegistryController.savedStateRegistry
 
+    val screenshotValue: MutableLiveData<Bitmap?> = MutableLiveData<Bitmap?>(null)
+
     override fun onCreate() {
         super.onCreate()
 
         savedStateRegistryController.performRestore(null)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
+
+        screenshotManager = ScreenshotManager(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
@@ -103,12 +148,23 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             layoutFlag,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.CENTER_VERTICAL or Gravity.END
-        }
+        )
 
+        lifecycleScope.launch {
+            val (xPos, yPos, isRightSide) = getWidgetLocationUseCase()
+            params.x = 0
+            params.y = yPos ?: 0
+            params.gravity = if(isRightSide == true) Gravity.END else Gravity.START
+
+            withContext(Dispatchers.Main) {
+                addOverlayView(params, isRightSide)
+            }
+        }
+    }
+
+    private fun addOverlayView(params: WindowManager.LayoutParams, isRightSide: Boolean?) {
         widgetView = ComposeView(this).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
             setViewTreeLifecycleOwner(this@OverlayService)
             setViewTreeViewModelStoreOwner(this@OverlayService)
             setViewTreeSavedStateRegistryOwner(this@OverlayService)
@@ -119,14 +175,21 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                     onClick = {
                         showNoteWindow = !showNoteWindow
                         showQuickNotePopup(isQuickNoteAdded)
-                    }, windowManager = windowManager,
+                    },
+                    windowManager = windowManager,
                     layoutParams = params,
-                    view = this
+                    view = this,
+                    isRightSide = isRightSide ?: true,
+                    saveWidgetLocation = ::saveWidgetLocation
                 )
             }
         }
 
         windowManager.addView(widgetView, params)
+    }
+
+    private suspend fun saveWidgetLocation(x: Int, y: Int, isRightSide: Boolean) {
+        saveWidgetLocationUseCase(x, y, isRightSide)
     }
 
     private fun createNotificationChannel() {
@@ -154,7 +217,9 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             .build()
     }
 
-    private fun showQuickNotePopup(show: Boolean) {
+
+
+    private fun showQuickNotePopup(show: Boolean, screenshot: Bitmap? = null) {
         if (!show) {
 
             val vibrator =
@@ -172,14 +237,19 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 vibrator.vibrate(30)
             }
 
-            val quickNoteView = ComposeView(this).apply {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            quickNoteView = ComposeView(this).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
                 setViewTreeLifecycleOwner(this@OverlayService)
                 setViewTreeViewModelStoreOwner(this@OverlayService)
                 setViewTreeSavedStateRegistryOwner(this@OverlayService)
 
                 setContent {
-                    QuickNotesOverlay(onClose = { removeQuickNotePopup(this) })
+                    QuickNotesOverlay(
+                        onSave = ::saveNoteToDatabase,
+                        onClose = { removeQuickNotePopup(this) },
+                        onScreenshot = { ScreenshotActivity.start(this@OverlayService) },
+                        screenshot = screenshot
+                    )
                 }
             }
 
@@ -202,6 +272,34 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             }
         }
     }
+
+    private fun captureAndShowNoteWindow() {
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main){
+                val screenshot = screenshotManager?.captureScreenshot()
+                capturedScreenshot = screenshot
+
+                delay(200)
+                screenshotValue.postValue(screenshot)
+            }
+        }
+    }
+
+    private suspend fun saveNoteToDatabase(
+        noteText: String,
+        onSaveStatus: (SaveStatus) -> Unit
+    ) {
+        createNoteUseCase(noteText, Language.AZERBAIJANI)
+            .onSuccess {
+                onSaveStatus(SaveStatus.SUCCESS)
+            }
+            .onError {
+                onSaveStatus(SaveStatus.ERROR)
+            }
+    }
+
     private fun removeQuickNotePopup(view: View) {
         windowManager.removeView(view)
         isQuickNoteAdded = false
@@ -211,6 +309,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         super.onDestroy()
         widgetView?.let { windowManager.removeView(it) }
         store.clear()
+        coroutineScope.cancel()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
 
@@ -220,7 +319,28 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+
+        when(intent?.action){
+            ACTION_SCREENSHOT_PERMISSION_GRANTED -> {
+                val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
+                val data: Intent? = intent.getParcelableExtra<Intent>(EXTRA_RESULT_DATA, Intent::class.java)
+                data?.let {
+                    screenshotManager?.setupMediaProjection(resultCode, data)
+                    captureAndShowNoteWindow()
+                }
+            }
+            ACTION_SCREENSHOT_PERMISSION_DENIED -> {
+//                showNoteWindow(true, null)
+            }
+        }
+
+        screenshotValue.observe(this) {
+            if(it != null){
+                showQuickNotePopup(true, it)
+            }
+
+        }
+
         return START_STICKY
     }
-
 }

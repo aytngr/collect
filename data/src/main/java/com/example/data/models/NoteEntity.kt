@@ -1,5 +1,6 @@
 package com.example.data.models
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -11,5 +12,7 @@ data class NoteEntity(
     val category: String,
     val language: String,
     val createdAt: Long,
-    val extractedData: String
+    val extractedData: String,
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
+    val screenshot: ByteArray? = null,
 )
