@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.domain.repository.PreferenceRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,6 +30,12 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext private va
         }
     }
 
+    override suspend fun saveString(key: String, value: String) {
+        context.dataStore.edit { settings ->
+            settings[stringPreferencesKey(key)] = value
+        }
+    }
+
     override suspend fun getInt(key: String): Flow<Int?> {
         return context.dataStore.data.map { preferences ->
             preferences[intPreferencesKey(key)]
@@ -38,6 +45,12 @@ class DataStoreRepositoryImpl @Inject constructor(@ApplicationContext private va
     override suspend fun getBoolean(key: String): Flow<Boolean?> {
         return context.dataStore.data.map { preferences ->
             preferences[booleanPreferencesKey(key)]
+        }
+    }
+
+    override suspend fun getString(key: String): Flow<String?> {
+        return context.dataStore.data.map { preferences ->
+            preferences[stringPreferencesKey(key)]
         }
     }
 }

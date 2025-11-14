@@ -16,6 +16,7 @@ import android.os.Vibrator
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.ActionBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.example.core.common.base.ScreenshotManager
+import com.example.core.common.base.saveToStorage
 import com.example.domain.models.Language
 import com.example.domain.models.SaveStatus
 import com.example.domain.models.onError
@@ -52,7 +54,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -62,7 +63,11 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     private lateinit var windowManager: WindowManager
     private var widgetView: View? = null
     private var quickNoteView: View? = null
+    private var popupParams: WindowManager.LayoutParams? = null
     var isQuickNoteAdded = false
+
+    private var currentText = ""
+    private var currentScreenshots: MutableList<Bitmap>? = mutableListOf<Bitmap>()
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val store = ViewModelStore()
@@ -79,7 +84,6 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private var screenshotManager: ScreenshotManager? = null
-    private var capturedScreenshot: Bitmap? = null
 
     companion object {
         private const val CHANNEL_ID = "overlay_service_channel"
@@ -219,8 +223,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
 
 
-    private fun showQuickNotePopup(show: Boolean, screenshot: Bitmap? = null) {
-        if (!show) {
+    private fun showQuickNotePopup(quickNoteAdded: Boolean, screenshot: Bitmap? = null) {
+        if (!quickNoteAdded) {
 
             val vibrator =
                 this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -245,15 +249,19 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
                 setContent {
                     QuickNotesOverlay(
+                        text = currentText,
                         onSave = ::saveNoteToDatabase,
-                        onClose = { removeQuickNotePopup(this) },
-                        onScreenshot = { ScreenshotActivity.start(this@OverlayService) },
-                        screenshot = screenshot
+                        onClose = { hideQuickNotePopup() },
+                        onScreenshot = { text, screenshots ->
+                            currentScreenshots = screenshots?.toMutableList()
+                            currentText = text
+                            ScreenshotActivity.start(this@OverlayService, screenshotManager?.getMediaProjection()) },
+                        screenshots = currentScreenshots
                     )
                 }
             }
 
-            val popupParams = WindowManager.LayoutParams(
+            popupParams = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -270,6 +278,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 windowManager.addView(quickNoteView, popupParams)
                 isQuickNoteAdded = true
             }
+        }else {
+            showQuickNotePopup()
         }
     }
 
@@ -277,21 +287,34 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         lifecycleScope.launch {
-            withContext(Dispatchers.Main){
+            hideQuickNotePopup()
                 val screenshot = screenshotManager?.captureScreenshot()
-                capturedScreenshot = screenshot
-
-                delay(200)
-                screenshotValue.postValue(screenshot)
+            withContext(Dispatchers.Main){
+                if(screenshot != null){
+                    (quickNoteView as ComposeView).setContent {
+                        QuickNotesOverlay(
+                            text = currentText,
+                            screenshots = (currentScreenshots.orEmpty() + screenshot),
+                            onSave = ::saveNoteToDatabase,
+                            onClose = { hideQuickNotePopup() },
+                            onScreenshot = { text, screenshots ->
+                                currentText = text
+                                currentScreenshots = screenshots?.toMutableList()
+                                ScreenshotActivity.start(this@OverlayService, screenshotManager?.getMediaProjection()) }
+                        )
+                    }
+                }
             }
+            showQuickNotePopup()
         }
     }
 
     private suspend fun saveNoteToDatabase(
         noteText: String,
+        images: List<Bitmap?>?,
         onSaveStatus: (SaveStatus) -> Unit
     ) {
-        createNoteUseCase(noteText, Language.AZERBAIJANI)
+        createNoteUseCase(content = noteText, images = images?.map { it?.saveToStorage(this) }, language = Language.AZERBAIJANI)
             .onSuccess {
                 onSaveStatus(SaveStatus.SUCCESS)
             }
@@ -300,10 +323,27 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             }
     }
 
-    private fun removeQuickNotePopup(view: View) {
+    private fun removeQuickNotePopup(view: View?) {
         windowManager.removeView(view)
         isQuickNoteAdded = false
     }
+
+    private fun hideQuickNotePopup() {
+        quickNoteView?.apply {
+            alpha = 0f
+            visibility = View.INVISIBLE
+        }
+//        windowManager.updateViewLayout(quickNoteView, popupParams)
+    }
+
+    private fun showQuickNotePopup() {
+        quickNoteView?.apply {
+            alpha = 1f
+            visibility = View.VISIBLE
+        }
+//        windowManager.updateViewLayout(quickNoteView, popupParams)
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -327,18 +367,13 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 data?.let {
                     screenshotManager?.setupMediaProjection(resultCode, data)
                     captureAndShowNoteWindow()
+                }?: run {
+                    captureAndShowNoteWindow()
                 }
             }
             ACTION_SCREENSHOT_PERMISSION_DENIED -> {
 //                showNoteWindow(true, null)
             }
-        }
-
-        screenshotValue.observe(this) {
-            if(it != null){
-                showQuickNotePopup(true, it)
-            }
-
         }
 
         return START_STICKY

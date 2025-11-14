@@ -14,6 +14,7 @@ fun NoteEntity.toDomain(): Note {
         category = NoteCategory.valueOf(category),
         language = Language.entries.first { it.code == language },
         createdAt = createdAt,
+        images = images,
         extractedData = Json.decodeFromString(extractedData)
     )
 }
@@ -25,6 +26,7 @@ fun Note.toEntity(): NoteEntity {
         category = category.name,
         language = language.code,
         createdAt = createdAt,
+        images = images,
         extractedData = Json.encodeToString(extractedData)
     )
 }
