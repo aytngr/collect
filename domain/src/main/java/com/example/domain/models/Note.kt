@@ -7,7 +7,8 @@ data class Note(
     val language: Language,
     val createdAt: Long = System.currentTimeMillis(),
     val extractedData: Map<String, String>,
-    val isRevealed: Boolean = false
+    val isRevealed: Boolean = false,
+    val images: List<String?>? = null
 )
 
 enum class NoteCategory {

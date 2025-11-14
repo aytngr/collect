@@ -1,11 +1,13 @@
 package com.example.domain.usecase
 
+import android.graphics.Bitmap
 import com.example.domain.models.DataResult
 import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.onSuccess
 import com.example.domain.processor.NoteProcessor
 import com.example.domain.repository.NotesRepository
+import dagger.Binds
 import javax.inject.Inject
 
 class CreateNoteUseCase @Inject constructor(
@@ -14,6 +16,7 @@ class CreateNoteUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         content: String,
+        images: List<String?>?,
         language: Language
     ): DataResult<Note> {
         return try {
@@ -22,13 +25,13 @@ class CreateNoteUseCase @Inject constructor(
             }
 
             val processedNote = noteProcessor.processVoiceInput(content, language)
-            var noteId : Long? = null
+                var noteId : Long? = null
             notesRepository.insertNote(processedNote)
                 .onSuccess {
                     noteId = it
                 }
             noteId?.let {
-                val savedNote = processedNote.copy(id = it)
+                val savedNote = processedNote.copy(id = it, images = images, createdAt = System.currentTimeMillis())
                 DataResult.Success(savedNote)
             } ?: run {
                 DataResult.Error(Exception("Error"))
