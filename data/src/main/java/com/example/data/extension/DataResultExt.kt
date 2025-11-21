@@ -2,13 +2,17 @@ package com.example.data.extension
 
 import android.util.Log
 import com.example.domain.models.DataResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
-inline fun <T> handleResponse(block: () -> T): DataResult<T> {
+suspend inline fun <T> handleResponse(crossinline block: suspend () -> T): DataResult<T> {
     try {
-        return DataResult.Success(block())
+        return withContext(Dispatchers.IO){
+            DataResult.Success(block())
+        }
     } catch (e: Exception) {
         Log.e("RESPONSE", e.message ?: "Error")
         return DataResult.Error(e)

@@ -41,25 +41,26 @@ class NoteListViewModel @Inject constructor(
 
     private fun loadNotes() {
         setState { copy(isLoading = true, error = null) }
-        getNotesUseCase.invoke()
-            .onEach { notes ->
-                notes.onSuccess {
-                    setState {
-                        copy(
-                            notes = it,
-                            filteredNotes = applyFilters(
-                                it,
-                                category = currentState.selectedCategory,
-                                searchQuery = currentState.searchQuery
-                            ),
-                            isLoading = false
-                        )
+        viewModelScope.launch {
+            getNotesUseCase.invoke()
+                .collect { notes ->
+                    notes.onSuccess {
+                        setState {
+                            copy(
+                                notes = it,
+                                filteredNotes = applyFilters(
+                                    it,
+                                    category = currentState.selectedCategory,
+                                    searchQuery = currentState.searchQuery
+                                ),
+                                isLoading = false
+                            )
+                        }
+                    }.onError {
+                        setState { copy(isLoading = false, error = it.message) }
                     }
-                }.onError {
-                    setState { copy(isLoading = false, error = it.message) }
                 }
-            }
-            .launchIn(viewModelScope)
+        }
     }
 
     private fun handleExpandedNotes(expandedNote: Note) {

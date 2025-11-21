@@ -245,13 +245,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadRecentNotes() {
-        getNotesUseCase.invoke()
-            .onEach { notes ->
-                notes.onSuccess {
-                    setState { copy(recentNotes = it.take(3)) }
+        viewModelScope.launch{
+            getNotesUseCase.invoke()
+                .collect { notes ->
+                    notes.onSuccess {
+                        setState { copy(recentNotes = it.take(3)) }
+                    }
                 }
-            }
-            .launchIn(viewModelScope)
+        }
+
     }
 
     override fun onCleared() {

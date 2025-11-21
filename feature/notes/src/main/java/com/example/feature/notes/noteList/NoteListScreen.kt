@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,6 +76,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NoteListScreen(
     onBackClick: () -> Unit,
+    onItemClick: (Long) -> Unit,
     viewModel: NoteListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -173,7 +175,8 @@ fun NoteListScreen(
                         modifier = Modifier.animateItem()
                     ) {
                         NoteItem(
-                            note = note
+                            note = note,
+                            onClick = { onItemClick(note.id) }
                         )
 
                         if (showDeleteDialog) {
@@ -277,10 +280,13 @@ private fun CategoryFilter(
 @Composable
 private fun NoteItem(
     note: Note,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onClick() }),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -409,7 +415,7 @@ fun SwipeableItemWithAction(
                                 }
                             }
                         },
-                        onDragStart = {onDragStart()}
+                        onDragStart = { onDragStart() }
                     )
                 }
         ) {
@@ -430,7 +436,6 @@ fun ActionIcon(
         onClick = onClick,
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
-            .background(backgroundColor)
             .padding(horizontal = 16.dp)
     ) {
         Icon(

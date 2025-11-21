@@ -4,11 +4,11 @@ datastorePreferences = "1.1.7"
 kotlin = "2.0.20"
 coreKtx = "1.15.0"
 junit = "4.13.2"
-junitVersion = "1.3.1-alpha02"
-espressoCore = "3.7.1"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
-composeBom = "2024.10.00"
+composeBom = "2025.11.00"
 androidGradlePlugin = "8.7.1"
 hilt = "2.52"
 hiltNavigationCompose = "1.2.0"
@@ -48,6 +48,7 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version = "2.8.0" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+compose-material-icons = { group = "androidx.compose.material", name = "material-icons-core"}
 
 # Hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

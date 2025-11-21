@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.navigation)
+    implementation(libs.compose.material.icons)
 
     // UI Testing
     debugImplementation(libs.androidx.ui.tooling)

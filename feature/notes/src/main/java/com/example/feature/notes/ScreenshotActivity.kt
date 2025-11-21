@@ -3,6 +3,7 @@ package com.example.feature.notes
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -51,12 +52,22 @@ class ScreenshotActivity : AppCompatActivity() {
             )
         } else {
             try {
-                val intent = Intent(this@ScreenshotActivity, OverlayService::class.java).apply {
-                    setAction(OverlayService.Companion.ACTION_SCREENSHOT_PERMISSION_GRANTED)
-                    putExtra(OverlayService.Companion.EXTRA_RESULT_CODE, RESULT_OK)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE){
+                    val mediaProjectionManager =
+                        getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+                    startActivityForResult(
+                        mediaProjectionManager.createScreenCaptureIntent(),
+                        REQUEST_MEDIA_PROJECTION
+                    )
+                }else{
+                    val intent = Intent(this@ScreenshotActivity, OverlayService::class.java).apply {
+                        setAction(OverlayService.Companion.ACTION_SCREENSHOT_PERMISSION_GRANTED)
+                        putExtra(OverlayService.Companion.EXTRA_RESULT_CODE, RESULT_OK)
+                    }
+                    startService(intent)
+                    finish()
                 }
-                startService(intent)
-                finish()
+
             } catch (e: Exception) {
                 val mediaProjectionManager =
                     getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager

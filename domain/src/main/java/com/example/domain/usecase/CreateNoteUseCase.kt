@@ -25,13 +25,18 @@ class CreateNoteUseCase @Inject constructor(
             }
 
             val processedNote = noteProcessor.processVoiceInput(content, language)
-                var noteId : Long? = null
-            notesRepository.insertNote(processedNote)
+            var noteId: Long? = null
+            notesRepository.insertNote(
+                processedNote.copy(
+                    images = images,
+                    createdAt = System.currentTimeMillis()
+                )
+            )
                 .onSuccess {
                     noteId = it
                 }
             noteId?.let {
-                val savedNote = processedNote.copy(id = it, images = images, createdAt = System.currentTimeMillis())
+                val savedNote = processedNote.copy(id = it)
                 DataResult.Success(savedNote)
             } ?: run {
                 DataResult.Error(Exception("Error"))

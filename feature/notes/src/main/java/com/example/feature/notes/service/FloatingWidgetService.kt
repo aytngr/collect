@@ -10,17 +10,17 @@ import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.Gravity
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.WindowManager
-import androidx.appcompat.app.ActionBar
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationCompat
@@ -47,13 +47,16 @@ import com.example.domain.usecase.CreateNoteUseCase
 import com.example.domain.usecase.GetWidgetLocationUseCase
 import com.example.domain.usecase.SaveWidgetLocationUseCase
 import com.example.feature.notes.ScreenshotActivity
+import com.example.feature.notes.SystemScreenshotDetector
 import com.example.feature.notes.widget.FloatingButton
 import com.example.feature.notes.widget.QuickNotesOverlay
+import com.example.feature.notes.widget.ScreenshotFlashAnimation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -64,6 +67,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     private var widgetView: View? = null
     private var quickNoteView: View? = null
     private var popupParams: WindowManager.LayoutParams? = null
+    private var screenshotAnimationView: ComposeView? = null
+    private var screenshotDetector: SystemScreenshotDetector? = null
     var isQuickNoteAdded = false
 
     private var currentText = ""
@@ -116,6 +121,17 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
         screenshotManager = ScreenshotManager(this)
 
+        screenshotDetector = SystemScreenshotDetector(this) {
+            // Hide floating button when system screenshot is taken
+            widgetView?.apply {
+                this.visibility = View.INVISIBLE
+            }
+            Handler(Looper.getMainLooper()).postDelayed({
+                widgetView?.visibility = View.VISIBLE
+            }, 2000)
+        }
+        screenshotDetector?.startListening()
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
             val notification = createNotification()
@@ -124,6 +140,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 startForeground(
                     NOTIFICATION_ID,
                     notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION or
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 )
             } else {
@@ -174,11 +191,9 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             setViewTreeSavedStateRegistryOwner(this@OverlayService)
 
             setContent {
-                var showNoteWindow by remember { mutableStateOf(false) }
                 FloatingButton(
                     onClick = {
-                        showNoteWindow = !showNoteWindow
-                        showQuickNotePopup(isQuickNoteAdded)
+                        addQuickNotePopup()
                     },
                     windowManager = windowManager,
                     layoutParams = params,
@@ -223,9 +238,10 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
 
 
-    private fun showQuickNotePopup(quickNoteAdded: Boolean, screenshot: Bitmap? = null) {
-        if (!quickNoteAdded) {
-
+    private fun addQuickNotePopup() {
+        // Check if popup already created
+        if (!isQuickNoteAdded) {
+            // Create QuickNotesOverlay
             val vibrator =
                 this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
@@ -251,7 +267,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                     QuickNotesOverlay(
                         text = currentText,
                         onSave = ::saveNoteToDatabase,
-                        onClose = { hideQuickNotePopup() },
+                        onClose = { removeQuickNotePopup() },
+                        onHide = { hideQuickNotePopup() },
                         onScreenshot = { text, screenshots ->
                             currentScreenshots = screenshots?.toMutableList()
                             currentText = text
@@ -274,11 +291,11 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 gravity = Gravity.CENTER
                 dimAmount = 0.5f
             }
-            if (!isQuickNoteAdded) {
-                windowManager.addView(quickNoteView, popupParams)
-                isQuickNoteAdded = true
-            }
-        }else {
+
+            windowManager.addView(quickNoteView, popupParams)
+            isQuickNoteAdded = true
+        } else {
+            // Reshow hidden QuickNotesOverlay
             showQuickNotePopup()
         }
     }
@@ -288,15 +305,21 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
         lifecycleScope.launch {
             hideQuickNotePopup()
-                val screenshot = screenshotManager?.captureScreenshot()
+            widgetView?.visibility = INVISIBLE
+            showScreenshotAnimation()
+            delay(250)
+            hideScreenshotAnimation()
+            val screenshot = screenshotManager?.captureScreenshot()
             withContext(Dispatchers.Main){
                 if(screenshot != null){
+                    // Recompose QuickNotesOverlay with new parameters
                     (quickNoteView as ComposeView).setContent {
                         QuickNotesOverlay(
                             text = currentText,
                             screenshots = (currentScreenshots.orEmpty() + screenshot),
                             onSave = ::saveNoteToDatabase,
-                            onClose = { hideQuickNotePopup() },
+                            onHide = { hideQuickNotePopup() },
+                            onClose = { removeQuickNotePopup() },
                             onScreenshot = { text, screenshots ->
                                 currentText = text
                                 currentScreenshots = screenshots?.toMutableList()
@@ -305,7 +328,52 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                     }
                 }
             }
+
+            widgetView?.visibility = VISIBLE
             showQuickNotePopup()
+        }
+    }
+
+    private fun showScreenshotAnimation() {
+        if (screenshotAnimationView != null) return
+
+        val layoutFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        } else {
+            @Suppress("DEPRECATION")
+            WindowManager.LayoutParams.TYPE_PHONE
+        }
+
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            layoutFlag,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            PixelFormat.TRANSLUCENT
+        )
+
+        screenshotAnimationView = ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            setViewTreeLifecycleOwner(this@OverlayService)
+            setViewTreeViewModelStoreOwner(this@OverlayService)
+            setViewTreeSavedStateRegistryOwner(this@OverlayService)
+
+            setContent {
+                MaterialTheme {
+                    ScreenshotFlashAnimation()
+                }
+            }
+        }
+
+        windowManager?.addView(screenshotAnimationView, params)
+    }
+
+    private fun hideScreenshotAnimation() {
+        screenshotAnimationView?.let {
+            windowManager?.removeView(it)
+            screenshotAnimationView = null
         }
     }
 
@@ -323,8 +391,9 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             }
     }
 
-    private fun removeQuickNotePopup(view: View?) {
-        windowManager.removeView(view)
+    private fun removeQuickNotePopup() {
+        currentScreenshots = mutableListOf<Bitmap>()
+        windowManager.removeView(quickNoteView)
         isQuickNoteAdded = false
     }
 
@@ -333,7 +402,6 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             alpha = 0f
             visibility = View.INVISIBLE
         }
-//        windowManager.updateViewLayout(quickNoteView, popupParams)
     }
 
     private fun showQuickNotePopup() {
@@ -341,7 +409,6 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             alpha = 1f
             visibility = View.VISIBLE
         }
-//        windowManager.updateViewLayout(quickNoteView, popupParams)
     }
 
 
@@ -363,7 +430,12 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         when(intent?.action){
             ACTION_SCREENSHOT_PERMISSION_GRANTED -> {
                 val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
-                val data: Intent? = intent.getParcelableExtra<Intent>(EXTRA_RESULT_DATA, Intent::class.java)
+                val data: Intent? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA)
+                }
                 data?.let {
                     screenshotManager?.setupMediaProjection(resultCode, data)
                     captureAndShowNoteWindow()
@@ -372,7 +444,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 }
             }
             ACTION_SCREENSHOT_PERMISSION_DENIED -> {
-//                showNoteWindow(true, null)
+
             }
         }
 
