@@ -37,8 +37,8 @@ class NotesRepositoryImpl @Inject constructor(
         return handleResponse { noteDao.deleteNote(note.toEntity()) }
     }
 
-    override suspend fun updateNote(note: Note){
-        handleResponse { noteDao.updateNote(note.toEntity()) }
+    override suspend fun updateNote(note: Note): DataResult<Unit> {
+        return handleResponse { noteDao.updateNote(note.toEntity()) }
     }
 
     override suspend fun getNotesByCategory(category: NoteCategory): Flow<DataResult<List<Note>>> {

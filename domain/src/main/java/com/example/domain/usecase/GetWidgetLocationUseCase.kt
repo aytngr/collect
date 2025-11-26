@@ -10,7 +10,7 @@ class GetWidgetLocationUseCase @Inject constructor(private val repository: Prefe
         return Triple(
             repository.getInt(key = "WIDGET_X").first(),
             repository.getInt(key = "WIDGET_Y").first(),
-            repository.getBoolean(key = "IS_RIGHT_SIDE").first()
+            repository.getBoolean(key = "IS_RIGHT_SIDE").first() ?: true
         )
     }
 }

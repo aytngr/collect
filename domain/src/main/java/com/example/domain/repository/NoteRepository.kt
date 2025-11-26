@@ -10,6 +10,6 @@ interface NotesRepository {
     suspend fun getNote(id: Long): DataResult<Note>
     suspend fun insertNote(note: Note): DataResult<Long>
     suspend fun deleteNote(note: Note): DataResult<Unit>
-    suspend fun updateNote(note: Note)
+    suspend fun updateNote(note: Note): DataResult<Unit>
     suspend fun getNotesByCategory(category: NoteCategory): Flow<DataResult<List<Note>>>
 }

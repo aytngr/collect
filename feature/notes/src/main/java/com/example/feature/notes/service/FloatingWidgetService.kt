@@ -140,7 +140,6 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 startForeground(
                     NOTIFICATION_ID,
                     notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION or
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 )
             } else {
@@ -304,33 +303,37 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
         lifecycleScope.launch {
-            hideQuickNotePopup()
-            widgetView?.visibility = INVISIBLE
-            showScreenshotAnimation()
-            delay(250)
-            hideScreenshotAnimation()
-            val screenshot = screenshotManager?.captureScreenshot()
-            withContext(Dispatchers.Main){
-                if(screenshot != null){
-                    // Recompose QuickNotesOverlay with new parameters
-                    (quickNoteView as ComposeView).setContent {
-                        QuickNotesOverlay(
-                            text = currentText,
-                            screenshots = (currentScreenshots.orEmpty() + screenshot),
-                            onSave = ::saveNoteToDatabase,
-                            onHide = { hideQuickNotePopup() },
-                            onClose = { removeQuickNotePopup() },
-                            onScreenshot = { text, screenshots ->
-                                currentText = text
-                                currentScreenshots = screenshots?.toMutableList()
-                                ScreenshotActivity.start(this@OverlayService, screenshotManager?.getMediaProjection()) }
-                        )
+            try {
+                hideQuickNotePopup()
+                widgetView?.visibility = INVISIBLE
+                showScreenshotAnimation()
+                delay(250)
+                hideScreenshotAnimation()
+                val screenshot = screenshotManager?.captureScreenshot()
+                withContext(Dispatchers.Main){
+                    if(screenshot != null){
+                        // Recompose QuickNotesOverlay with new parameters
+                        (quickNoteView as ComposeView).setContent {
+                            QuickNotesOverlay(
+                                text = currentText,
+                                screenshots = (currentScreenshots.orEmpty() + screenshot),
+                                onSave = ::saveNoteToDatabase,
+                                onHide = { hideQuickNotePopup() },
+                                onClose = { removeQuickNotePopup() },
+                                onScreenshot = { text, screenshots ->
+                                    currentText = text
+                                    currentScreenshots = screenshots?.toMutableList()
+                                    ScreenshotActivity.start(this@OverlayService, screenshotManager?.getMediaProjection()) }
+                            )
+                        }
                     }
                 }
-            }
 
-            widgetView?.visibility = VISIBLE
-            showQuickNotePopup()
+                widgetView?.visibility = VISIBLE
+                showQuickNotePopup()
+            } finally {
+                switchToSpecialUseType()
+            }
         }
     }
 
@@ -436,6 +439,9 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                     @Suppress("DEPRECATION")
                     intent.getParcelableExtra(EXTRA_RESULT_DATA)
                 }
+
+                switchToMediaProjectionType()
+
                 data?.let {
                     screenshotManager?.setupMediaProjection(resultCode, data)
                     captureAndShowNoteWindow()
@@ -449,5 +455,36 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         }
 
         return START_STICKY
+    }
+
+    private fun switchToMediaProjectionType() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                val notification = createNotification()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun switchToSpecialUseType() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            try {
+                startForeground(
+                    NOTIFICATION_ID,
+                    createNotification(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }

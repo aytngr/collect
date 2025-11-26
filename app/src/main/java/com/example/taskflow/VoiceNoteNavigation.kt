@@ -1,6 +1,11 @@
 package com.example.taskflow
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -14,7 +19,9 @@ import com.example.feature.notes.noteList.NoteListScreen
 fun VoiceNoteNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "home"
+        startDestination = "home",
+        modifier = Modifier
+            .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
         composable("home") {
             HomeScreen(
