@@ -3,10 +3,12 @@ package com.example.domain.models
 data class Note(
     val id: Long = 0,
     val content: String,
+    val title: String,
     val category: NoteCategory,
     val language: Language,
     val createdAt: Long = System.currentTimeMillis(),
     val extractedData: Map<String, String>,
+    val orderN: Int = 0,
     val isRevealed: Boolean = false,
     val images: List<String?>? = null
 )

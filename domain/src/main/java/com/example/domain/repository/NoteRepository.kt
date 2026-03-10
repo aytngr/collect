@@ -11,5 +11,6 @@ interface NotesRepository {
     suspend fun insertNote(note: Note): DataResult<Long>
     suspend fun deleteNote(note: Note): DataResult<Unit>
     suspend fun updateNote(note: Note): DataResult<Unit>
+    suspend fun updateNotes(notes: List<Note>): DataResult<Unit>
     suspend fun getNotesByCategory(category: NoteCategory): Flow<DataResult<List<Note>>>
 }

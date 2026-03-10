@@ -385,7 +385,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         images: List<Bitmap?>?,
         onSaveStatus: (SaveStatus) -> Unit
     ) {
-        createNoteUseCase(content = noteText, images = images?.map { it?.saveToStorage(this) }, language = Language.AZERBAIJANI)
+        createNoteUseCase(title = null, content = noteText, images = images?.map { it?.saveToStorage(this) }, language = Language.AZERBAIJANI)
             .onSuccess {
                 onSaveStatus(SaveStatus.SUCCESS)
             }

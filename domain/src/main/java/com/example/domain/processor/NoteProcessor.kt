@@ -13,6 +13,7 @@ class NoteProcessor @Inject constructor() {
 
         return Note(
             content = content,
+            title = "",
             category = category,
             language = language,
             extractedData = extractedData

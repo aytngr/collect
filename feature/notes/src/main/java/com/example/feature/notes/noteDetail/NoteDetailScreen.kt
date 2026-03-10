@@ -7,28 +7,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,8 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,7 +49,8 @@ fun NoteDetailScreen(
     var showImagePreview by remember { mutableIntStateOf(-1) }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    var text by remember { mutableStateOf(state.note?.content) }
+    var content by remember { mutableStateOf(state.note?.content) }
+    var title by remember { mutableStateOf(state.note?.title) }
 
     LaunchedEffect(viewModel) {
         viewModel.handleIntent(NoteDetailContract.Intent.LoadNote(itemId))
@@ -85,13 +77,13 @@ fun NoteDetailScreen(
             BasicTextField(
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = MaterialTheme.typography.headlineMedium.copy(color = Color.White),
-                value = (if(text == null) state.note?.content else text) ?: "",
+                value = (if(title == null) state.note?.title else title) ?: "",
                 onValueChange = {
-                    text = it
+                    title = it
                     viewModel.handleIntent(
                         NoteDetailContract.Intent.ChangeText(
                             note = state.note!!,
-                            text = it
+                            title = it
                         )
                     )
                 }
@@ -122,13 +114,13 @@ fun NoteDetailScreen(
             BasicTextField(
                 modifier = Modifier.fillMaxSize(),
                 textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
-                value = (if(text == null) state.note?.content else text) ?: "",
+                value = (if(content == null) state.note?.content else content) ?: "",
                 onValueChange = {
-                    text = it
+                    content = it
                     viewModel.handleIntent(
                         NoteDetailContract.Intent.ChangeText(
                             note = state.note!!,
-                            text = it
+                            content = it
                         )
                     )
                 }

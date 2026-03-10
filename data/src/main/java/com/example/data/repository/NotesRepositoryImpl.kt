@@ -41,6 +41,10 @@ class NotesRepositoryImpl @Inject constructor(
         return handleResponse { noteDao.updateNote(note.toEntity()) }
     }
 
+    override suspend fun updateNotes(notes: List<Note>): DataResult<Unit> {
+        return handleResponse { noteDao.updateNotes(notes.map { it.toEntity() }) }
+    }
+
     override suspend fun getNotesByCategory(category: NoteCategory): Flow<DataResult<List<Note>>> {
         return withContext(Dispatchers.IO){
             noteDao.getNotesByCategory(category.name).handleFlowResponse { entities ->

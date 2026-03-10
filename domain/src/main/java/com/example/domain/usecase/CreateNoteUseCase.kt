@@ -15,6 +15,7 @@ class CreateNoteUseCase @Inject constructor(
     private val noteProcessor: NoteProcessor
 ) {
     suspend operator fun invoke(
+        title: String?,
         content: String,
         images: List<String?>?,
         language: Language
@@ -28,6 +29,7 @@ class CreateNoteUseCase @Inject constructor(
             var noteId: Long? = null
             notesRepository.insertNote(
                 processedNote.copy(
+                    title = title ?: "",
                     images = images,
                     createdAt = System.currentTimeMillis()
                 )

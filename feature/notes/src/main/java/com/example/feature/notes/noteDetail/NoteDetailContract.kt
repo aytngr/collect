@@ -9,7 +9,7 @@ class NoteDetailContract {
 
     sealed class Intent: BaseIntent {
         data class LoadNote(val id: Long): Intent()
-        data class ChangeText(val note: Note, val text: String): Intent()
+        data class ChangeText(val note: Note, val content: String? = null, val title: String? = null): Intent()
         data class DeleteNote(val note: Note): Intent()
     }
 

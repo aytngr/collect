@@ -9,6 +9,10 @@ import com.example.domain.usecase.DeleteNoteUseCase
 import com.example.domain.usecase.GetNoteUseCase
 import com.example.domain.usecase.UpdateNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,32 +24,59 @@ class NoteDetailViewModel @Inject constructor(
 ) : BaseViewModel<NoteDetailContract.Intent, NoteDetailContract.State, NoteDetailContract.Effect>(
     NoteDetailContract.State()
 ) {
+    private val contentFlow = MutableStateFlow("")
+    private val titleFlow = MutableStateFlow("")
 
     override fun handleIntent(intent: NoteDetailContract.Intent) {
         when (intent) {
             is NoteDetailContract.Intent.LoadNote -> loadNote(intent.id)
             is NoteDetailContract.Intent.DeleteNote -> deleteNote(intent.note)
-            is NoteDetailContract.Intent.ChangeText -> updateNote(note = intent.note, text = intent.text)
+            is NoteDetailContract.Intent.ChangeText -> updateNote(text = intent.content, title = intent.title)
         }
     }
 
-    private fun updateNote(note:Note, text: String){
-        viewModelScope.launch {
-            updateNoteUseCase.invoke(note = note, content = text)
-                .onSuccess {
-//                    loadNote(note.id)
-                }.onError {
-                    setState { copy(isLoading = false, error = it.message)  }
-                }
-        }
+    private fun updateNote(text: String?, title: String?){
+        text?.let{ contentFlow.value = it }
+        title?.let{ titleFlow.value = it }
     }
 
     private fun loadNote(id: Long) {
-//        setState { copy(isLoading = true, error = null) }
+        setState { copy(isLoading = true, error = null) }
         viewModelScope.launch {
             getNoteUseCase.invoke(id)
                 .onSuccess {
                     setState { copy(isLoading = false, note = it) }
+
+                    contentFlow.value = it.content
+                    titleFlow.value = it.title
+
+                    launch{
+                        contentFlow
+                            .debounce(400)
+                            .distinctUntilChanged()
+                            .collectLatest { content ->
+                                updateNoteUseCase.invoke(note = it, content = content)
+                                    .onSuccess {
+
+                                    }.onError {
+                                        setState { copy(isLoading = false, error = it.message)  }
+                                    }
+                            }
+                    }
+
+                    launch {
+                        titleFlow
+                            .debounce(400)
+                            .distinctUntilChanged()
+                            .collectLatest { content ->
+                                updateNoteUseCase.invoke(note = it, title = content)
+                                    .onSuccess {
+
+                                    }.onError {
+                                        setState { copy(isLoading = false, error = it.message)  }
+                                    }
+                            }
+                    }
                 }.onError {
                     setState { copy(isLoading = false, error = it.message)  }
             }

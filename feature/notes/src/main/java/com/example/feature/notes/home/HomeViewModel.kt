@@ -176,7 +176,7 @@ class HomeViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            createNoteUseCase(content, null, currentState.selectedLanguage)
+            createNoteUseCase(null, content, null, currentState.selectedLanguage)
                 .onSuccess { note ->
                     setState {
                         copy(

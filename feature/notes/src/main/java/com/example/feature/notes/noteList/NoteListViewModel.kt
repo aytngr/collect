@@ -1,28 +1,39 @@
 package com.example.feature.notes.noteList
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.core.common.base.BaseViewModel
+import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import com.example.domain.models.onError
 import com.example.domain.models.onSuccess
+import com.example.domain.usecase.CreateNoteUseCase
 import com.example.domain.usecase.DeleteNoteUseCase
 import com.example.domain.usecase.GetNotesUseCase
+import com.example.domain.usecase.UpdateNoteUseCase
+import com.example.domain.usecase.UpdateNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesUseCase,
-    private val deleteNoteUseCase: DeleteNoteUseCase
+    private val createNoteUseCase: CreateNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val updateNotesUseCase: UpdateNotesUseCase,
+    private val updateNoteUseCase: UpdateNoteUseCase,
 ) : BaseViewModel<NoteListContract.Intent, NoteListContract.State, NoteListContract.Effect>(
     NoteListContract.State()
 ) {
+
+    var noteList by mutableStateOf(emptyList<Note>())
+        private set
+
+    var reorderUpdate = false;
 
     init {
         handleIntent(NoteListContract.Intent.LoadNotes)
@@ -36,6 +47,53 @@ class NoteListViewModel @Inject constructor(
             NoteListContract.Intent.LoadNotes -> loadNotes()
             is NoteListContract.Intent.HandleExpandedNotes -> handleExpandedNotes(intent.expandedNote)
             is NoteListContract.Intent.SearchNote -> searchNotes(intent.query)
+            is NoteListContract.Intent.CombineNotes -> combineNotes(intent.draggedNote, intent.targetNote)
+            is NoteListContract.Intent.ReorderNotes -> reorderNotes(intent.fromNote, intent.toNote)
+            is NoteListContract.Intent.UpdateNotesWithOrder -> onDragEnd()
+        }
+    }
+
+    private fun combineNotes(draggedNote: Note, targetNote: Note) {
+        viewModelScope.launch {
+            val combinedContent = "${targetNote.content}${draggedNote.title}${draggedNote.content}"
+            val combinedImages = targetNote.images.orEmpty() + draggedNote.images.orEmpty()
+
+            // Create combined note
+//            deleteNoteUseCase(targetNote)
+//            createNoteUseCase(title = targetNote.title, combinedContent, combinedImages, Language.AZERBAIJANI)
+            //Update target note
+            updateNoteUseCase.invoke(note = targetNote, title = targetNote.title, content = combinedContent, images = combinedImages, language = targetNote.language)
+            deleteNoteUseCase(draggedNote)
+        }
+    }
+
+    private fun reorderNotes(fromNote: Long, toNote: Long) {
+        viewModelScope.launch {
+            val from = noteList.indexOfFirst { it.id == fromNote }
+            val to = noteList.indexOfFirst { it.id == toNote }
+            if (from != -1 && to != -1) {
+                noteList = noteList.toMutableList().apply { add(to, removeAt(from)) }
+
+                setState {
+                    copy(
+                        notes = noteList,
+                        filteredNotes = applyFilters(
+                            noteList,
+                            currentState.selectedCategory,
+                            currentState.searchQuery
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+
+    fun onDragEnd() {
+        viewModelScope.launch {
+            val updated = noteList.mapIndexed { index, note -> note.copy(orderN = index) }
+            reorderUpdate = true
+            updateNotesUseCase.invoke(updated)
         }
     }
 
@@ -45,17 +103,21 @@ class NoteListViewModel @Inject constructor(
             getNotesUseCase.invoke()
                 .collect { notes ->
                     notes.onSuccess {
-                        setState {
-                            copy(
-                                notes = it,
-                                filteredNotes = applyFilters(
-                                    it,
-                                    category = currentState.selectedCategory,
-                                    searchQuery = currentState.searchQuery
-                                ),
-                                isLoading = false
-                            )
+                        if(!reorderUpdate){
+                            noteList = it.mapIndexed { index, note -> note.copy(orderN = index)}
+                            setState {
+                                copy(
+                                    notes = it,
+                                    filteredNotes = applyFilters(
+                                        it,
+                                        category = currentState.selectedCategory,
+                                        searchQuery = currentState.searchQuery
+                                    ),
+                                    isLoading = false
+                                )
+                            }
                         }
+                        reorderUpdate = false
                     }.onError {
                         setState { copy(isLoading = false, error = it.message) }
                     }

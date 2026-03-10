@@ -8,24 +8,14 @@ import com.example.domain.models.onSuccess
 import com.example.domain.repository.NotesRepository
 import javax.inject.Inject
 
-class UpdateNoteUseCase @Inject constructor(
+class UpdateNotesUseCase @Inject constructor(
     private val notesRepository: NotesRepository,
 ) {
     suspend operator fun invoke(
-        note: Note,
-        content: String? = null,
-        title: String? = null,
-        images: List<String?>? = null,
-        language: Language? = null
+        notes: List<Note>,
     ): DataResult<Unit> {
         return try {
-            val updatedNote = note.copy(
-                content = content ?: note.content,
-                title = title ?: note.title,
-                images = images ?: note.images
-            )
-
-            notesRepository.updateNote(updatedNote)
+            notesRepository.updateNotes(notes)
                 .onSuccess {
                     DataResult.Success(it)
                 }

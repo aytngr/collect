@@ -11,10 +11,12 @@ fun NoteEntity.toDomain(): Note {
     return Note(
         id = id,
         content = content,
+        title = title,
         category = NoteCategory.valueOf(category),
         language = Language.entries.first { it.code == language },
         createdAt = createdAt,
         images = images,
+        orderN = orderN,
         extractedData = Json.decodeFromString(extractedData)
     )
 }
@@ -23,10 +25,12 @@ fun Note.toEntity(): NoteEntity {
     return NoteEntity(
         id = id,
         content = content,
+        title = title,
         category = category.name,
         language = language.code,
         createdAt = createdAt,
         images = images,
+        orderN = orderN,
         extractedData = Json.encodeToString(extractedData)
     )
 }
