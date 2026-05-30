@@ -86,4 +86,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.moshi)
+
+    implementation(libs.reorderable)
 }
