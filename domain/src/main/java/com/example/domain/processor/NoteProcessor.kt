@@ -16,7 +16,8 @@ class NoteProcessor @Inject constructor() {
             title = "",
             category = category,
             language = language,
-            extractedData = extractedData
+            extractedData = extractedData,
+            timePassed = "1h"
         )
     }
 

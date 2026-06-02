@@ -7,23 +7,25 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.feature.notes.home.HomeScreen
-import com.example.feature.notes.noteDetail.NoteDetailScreen
+import androidx.navigation.toRoute
+import com.example.core.navigation.Home
+import com.example.core.navigation.NoteDetail
+import com.example.core.navigation.Notes
+import com.example.feature.home.HomeScreen
+import com.example.feature.note_detail.NoteDetailScreen
 import com.example.feature.notes.noteList.NoteListScreen
 
 @Composable
 fun VoiceNoteNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = Home,
         modifier = Modifier
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        composable("home") {
+        composable<Home> {
             HomeScreen(
                 onNavigateToNotesList = {
                     navController.navigate("notes_list")
@@ -31,21 +33,21 @@ fun VoiceNoteNavigation(navController: NavHostController) {
             )
         }
 
-        composable("notes_list") {
+        composable<Notes> {
             NoteListScreen(
                 onBackClick = {
                     navController.popBackStack()
                 },
                 onItemClick = { id ->
-                    navController.navigate("note_detail/$id")
+                    navController.navigate(NoteDetail(id))
                 }
             )
         }
 
-        composable("note_detail/{itemId}", arguments = listOf(navArgument("itemId"){type = NavType.LongType})) { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getLong("itemId")
+        composable<NoteDetail> { backStackEntry ->
+            val route: NoteDetail = backStackEntry.toRoute()
             NoteDetailScreen(
-                itemId = itemId ?: -1
+                itemId = route.noteId
             )
         }
     }

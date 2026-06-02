@@ -17,7 +17,7 @@ fun NoteEntity.toDomain(): Note {
         createdAt = createdAt,
         images = images,
         orderN = orderN,
-        extractedData = Json.decodeFromString(extractedData)
+        extractedData = Json.decodeFromString(extractedData),
     )
 }
 

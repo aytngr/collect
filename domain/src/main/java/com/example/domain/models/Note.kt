@@ -7,9 +7,11 @@ data class Note(
     val category: NoteCategory,
     val language: Language,
     val createdAt: Long = System.currentTimeMillis(),
+    val timePassed: String = "",
     val extractedData: Map<String, String>,
     val orderN: Int = 0,
     val isRevealed: Boolean = false,
+    val isFav: Boolean = false,
     val images: List<String?>? = null
 )
 

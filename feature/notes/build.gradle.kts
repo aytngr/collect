@@ -88,4 +88,6 @@ dependencies {
     implementation(libs.moshi)
 
     implementation(libs.reorderable)
+
+    implementation(project(":core:ui"))
 }
