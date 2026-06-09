@@ -12,12 +12,13 @@ class NoteProcessor @Inject constructor() {
         val extractedData = extractInformation(content, category, language)
 
         return Note(
-            content = content,
+//            content = content,
             title = "",
             category = category,
             language = language,
             extractedData = extractedData,
-            timePassed = "1h"
+            timePassed = "1h",
+            textBlocks = emptyList()
         )
     }
 

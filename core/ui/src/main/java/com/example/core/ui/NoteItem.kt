@@ -58,7 +58,7 @@ fun NoteItem(
                 )
                 HorizontalSpacer(8.dp)
             }
-            Text(text = title, style = AppTextStyle.NoteTitle, modifier = Modifier.weight(1f))
+            Text(text = title.takeIf { it.isNotEmpty() } ?: "Untitled", style = AppTextStyle.NoteTitle, modifier = Modifier.weight(1f))
             Text(
                 text = time, style = AppTextStyle.Metadata,
                 color = AppTheme.colors.faint

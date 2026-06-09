@@ -34,7 +34,7 @@ class VoiceRecognitionRepositoryImpl @Inject constructor(
                 }
 
                 // Clean up any existing recognizer
-                stopListening()
+                finishListening()
 
                 speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
                 isCurrentlyListening = true
@@ -146,14 +146,18 @@ class VoiceRecognitionRepositoryImpl @Inject constructor(
 
         // Clean up when flow is cancelled
         awaitClose {
-            stopListening()
+            finishListening()
         }
     }
 
-    override fun stopListening() {
+    override fun finishListening() {
         speechRecognizer?.destroy()
         speechRecognizer = null
         isCurrentlyListening = false
+    }
+
+    override fun stopListening() {
+        if(isListening()) speechRecognizer?.stopListening()
     }
 
     override fun isListening(): Boolean = isCurrentlyListening

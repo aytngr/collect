@@ -15,34 +15,34 @@ class CreateNoteUseCase @Inject constructor(
     private val noteProcessor: NoteProcessor
 ) {
     suspend operator fun invoke(
-        title: String?,
-        content: String,
+//        title: String?,
+//        textBlocks: String,
         images: List<String?>?,
         language: Language
     ): DataResult<Note> {
         return try {
-            if (content.isBlank()) {
-                return DataResult.Error(IllegalArgumentException("Note content cannot be empty"))
-            }
+//            if (content.isBlank()) {
+//                return DataResult.Error(IllegalArgumentException("Note content cannot be empty"))
+//            }
 
-            val processedNote = noteProcessor.processVoiceInput(content, language)
-            var noteId: Long? = null
-            notesRepository.insertNote(
-                processedNote.copy(
-                    title = title ?: "",
-                    images = images,
-                    createdAt = System.currentTimeMillis()
-                )
-            )
-                .onSuccess {
-                    noteId = it
-                }
-            noteId?.let {
-                val savedNote = processedNote.copy(id = it)
-                DataResult.Success(savedNote)
-            } ?: run {
+//            val processedNote = noteProcessor.processVoiceInput(content, language)
+//            var noteId: Long? = null
+//            notesRepository.insertNote(
+//                processedNote.copy(
+//                    title = title ?: "",
+//                    images = images,
+//                    createdAt = System.currentTimeMillis()
+//                )
+//            )
+//                .onSuccess {
+//                    noteId = it
+//                }
+//            noteId?.let {
+//                val savedNote = processedNote.copy(id = it)
+//                DataResult.Success(savedNote)
+//            } ?: run {
                 DataResult.Error(Exception("Error"))
-            }
+//            }
 
         } catch (e: Exception) {
             DataResult.Error(e)

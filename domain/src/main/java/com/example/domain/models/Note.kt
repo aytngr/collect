@@ -2,13 +2,13 @@ package com.example.domain.models
 
 data class Note(
     val id: Long = 0,
-    val content: String,
-    val title: String,
-    val category: NoteCategory,
-    val language: Language,
+    val textBlocks: List<TextBlock> = listOf(),
+    val title: String = "",
+    val category: NoteCategory = NoteCategory.GENERAL,
+    val language: Language = Language.AZERBAIJANI,
     val createdAt: Long = System.currentTimeMillis(),
     val timePassed: String = "",
-    val extractedData: Map<String, String>,
+    val extractedData: Map<String, String> = emptyMap(),
     val orderN: Int = 0,
     val isRevealed: Boolean = false,
     val isFav: Boolean = false,

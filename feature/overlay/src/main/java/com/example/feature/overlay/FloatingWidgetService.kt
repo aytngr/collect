@@ -370,18 +370,18 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         images: List<Bitmap?>?,
         onSaveStatus: (SaveStatus) -> Unit
     ) {
-        createNoteUseCase(
-            title = null,
-            content = noteText,
-            images = images?.map { it?.saveToStorage(this) },
-            language = Language.AZERBAIJANI
-        )
-            .onSuccess {
-                onSaveStatus(SaveStatus.SUCCESS)
-            }
-            .onError {
-                onSaveStatus(SaveStatus.ERROR)
-            }
+//        createNoteUseCase(
+//            title = null,
+//            content = noteText,
+//            images = images?.map { it?.saveToStorage(this) },
+//            language = Language.AZERBAIJANI
+//        )
+//            .onSuccess {
+//                onSaveStatus(SaveStatus.SUCCESS)
+//            }
+//            .onError {
+//                onSaveStatus(SaveStatus.ERROR)
+//            }
     }
 
     private fun removeQuickNotePopup() {

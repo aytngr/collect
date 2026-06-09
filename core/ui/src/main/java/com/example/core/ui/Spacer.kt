@@ -1,5 +1,7 @@
 package com.example.core.ui
 
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -15,4 +17,14 @@ fun HorizontalSpacer(size: Dp) {
 @Composable
 fun VerticalSpacer(size: Dp) {
     Spacer(Modifier.height(size))
+}
+
+@Composable
+fun RowScope.WeightSpacer() {
+    Spacer(modifier = Modifier.weight(1f))
+}
+
+@Composable
+fun ColumnScope.WeightSpacer() {
+    Spacer(modifier = Modifier.weight(1f))
 }

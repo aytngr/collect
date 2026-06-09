@@ -9,4 +9,4 @@ object Home
 object Notes
 
 @Serializable
-data class NoteDetail(val noteId: Long)
+data class NoteDetail(val noteId: Long?)

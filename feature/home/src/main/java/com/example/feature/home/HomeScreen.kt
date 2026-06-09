@@ -62,9 +62,10 @@ import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.core.ui.NoteItem
 import com.example.core.ui.R
+import com.example.core.ui.VerticalSpacer
 
 @Composable
-fun HomeScreen(onNavigateToNotesList: () -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(onNavigateToNotesList: () -> Unit, onNavigateToNoteDetail: (noteId: Long?) -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -82,10 +83,10 @@ fun HomeScreen(onNavigateToNotesList: () -> Unit, viewModel: HomeViewModel = hil
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                HomeContract.Effect.NavigateToNotesList -> onNavigateToNotesList()
                 HomeContract.Effect.RequestMicrophonePermission -> {
                     permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 }
+                is HomeContract.Effect.NavigateToNoteDetail -> onNavigateToNoteDetail(effect.id)
 
                 is HomeContract.Effect.ShowError -> Toast.makeText(
                     context,
@@ -104,14 +105,18 @@ fun HomeScreen(onNavigateToNotesList: () -> Unit, viewModel: HomeViewModel = hil
 
     HomeContent(
         state = state,
-        onIntent = viewModel::handleIntent
+        onIntent = viewModel::handleIntent,
+        onNavigateToNotesList = onNavigateToNotesList,
+        onNavigateToNoteDetail = onNavigateToNoteDetail,
     )
 }
 
 @Composable
 private fun HomeContent(
     state: HomeContract.State,
-    onIntent: (HomeContract.Intent) -> Unit
+    onIntent: (HomeContract.Intent) -> Unit,
+    onNavigateToNoteDetail: (Long?) -> Unit,
+    onNavigateToNotesList: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -159,13 +164,11 @@ private fun HomeContent(
                         tint = AppTheme.colors.ink
                     )
                 }
-                Box(
+                IconButton(
                     modifier = Modifier
-                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(AppTheme.colors.surfaceAlt)
-                        .clickable { /* TODO: navigate to profile */ },
-                    contentAlignment = Alignment.Center
+                        .background(AppTheme.colors.surfaceAlt),
+                    onClick = {}
                 ) {
                     Text(
                         text = "A",
@@ -202,6 +205,8 @@ private fun HomeContent(
         //todo list of reminders
         ReminderBox(true, "Standup - Thursday", "Today 9 AM")
         ReminderBox(false, "Standup - Thursday", "Today 9 AM")
+
+        VerticalSpacer(16.dp)
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
@@ -246,10 +251,11 @@ private fun HomeContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(onClick = { onIntent(HomeContract.Intent.CreateNewNote) })
                 .border(width = 1.dp, color = AppTheme.colors.line, shape = AppShapes.large)
                 .clip(AppShapes.large)
                 .background(color = Color.White)
-                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
                 text = "Capture a thought...",
@@ -257,15 +263,13 @@ private fun HomeContent(
                 color = AppTheme.colors.faint,
                 modifier = Modifier.weight(1f)
             )
-            Box(
+
+            IconButton(
                 modifier = Modifier
-                    .size(38.dp)
                     .clip(CircleShape)
-                    .background(color = AppTheme.colors.accent),
-                contentAlignment = Alignment.Center
-            ) {
+                    .background(color = AppTheme.colors.accent), onClick = {  }) {
                 Icon(
-                    painterResource(id = R.drawable.mic),
+                    painter = painterResource(R.drawable.mic),
                     tint = Color.White,
                     contentDescription = ""
                 )
@@ -432,6 +436,8 @@ private fun HomeContentPreview() {
                 greeting = "Good morning, Aytan",
                 recentNotes = emptyList()
             ),
+            onNavigateToNoteDetail = {},
+            onNavigateToNotesList = {},
             onIntent = {}
         )
     }

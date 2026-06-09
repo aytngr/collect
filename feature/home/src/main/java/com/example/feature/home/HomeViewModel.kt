@@ -8,7 +8,7 @@ import com.example.domain.models.VoiceRecognitionResult
 import com.example.domain.models.onError
 import com.example.domain.models.onSuccess
 import com.example.domain.repository.VoiceRecognitionRepository
-import com.example.domain.usecase.CreateNoteUseCase
+import com.example.domain.usecase.CreateEmptyNoteUseCase
 import com.example.domain.usecase.GetNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -23,11 +23,10 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 import java.time.Duration
-import kotlin.concurrent.timer
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val createNoteUseCase: CreateNoteUseCase,
+    private val createEmptyNoteUseCase: CreateEmptyNoteUseCase,
     private val getNotesUseCase: GetNotesUseCase,
     private val permissionHandler: PermissionHandler,
     private val voiceRecognitionRepository: VoiceRecognitionRepository
@@ -52,7 +51,19 @@ class HomeViewModel @Inject constructor(
             is HomeContract.Intent.ProcessVoiceResult -> processVoiceResult(intent.text)
             is HomeContract.Intent.RetryVoiceRecognition -> retryVoiceRecognition()
             is HomeContract.Intent.ClearTranscription -> clearTranscription()
-            is HomeContract.Intent.NavigateToNotesList -> navigateToNotesList()
+            is HomeContract.Intent.CreateNewNote -> createNewNote()
+        }
+    }
+
+    private fun createNewNote(){
+        viewModelScope.launch {
+            createEmptyNoteUseCase()
+                .onSuccess { note ->
+                    sendEffect(HomeContract.Effect.NavigateToNoteDetail(note.id))
+                }
+                .onError { error ->
+                    sendEffect(HomeContract.Effect.ShowError(error.message ?: ""))
+                }
         }
     }
 
@@ -187,33 +198,33 @@ class HomeViewModel @Inject constructor(
             )
         }
 
-        viewModelScope.launch {
-            createNoteUseCase(null, content, null, currentState.selectedLanguage)
-                .onSuccess { note ->
-                    setState {
-                        HomeContract.State(
-                            voiceState = HomeContract.VoiceState.Idle,
-                            transcribedText = getSuccessMessage()
-                        )
-                    }
-                    sendEffect(HomeContract.Effect.ShowToast("Note created!"))
-                    loadRecentNotes()
-
-                    // Clear transcription after delay
-                    delay(2000)
-                    setState { HomeContract.State(transcribedText = "") }
-                }
-                .onError { error ->
-                    val errorMessage = error.message ?: "Failed to create note"
-                    setState {
-                        HomeContract.State(
-                            voiceState = HomeContract.VoiceState.Idle,
-                            error = errorMessage
-                        )
-                    }
-                    sendEffect(HomeContract.Effect.ShowError(errorMessage))
-                }
-        }
+//        viewModelScope.launch {
+//            createNoteUseCase(null, content, null, currentState.selectedLanguage)
+//                .onSuccess { note ->
+//                    setState {
+//                        HomeContract.State(
+//                            voiceState = HomeContract.VoiceState.Idle,
+//                            transcribedText = getSuccessMessage()
+//                        )
+//                    }
+//                    sendEffect(HomeContract.Effect.ShowToast("Note created!"))
+//                    loadRecentNotes()
+//
+//                    // Clear transcription after delay
+//                    delay(2000)
+//                    setState { HomeContract.State(transcribedText = "") }
+//                }
+//                .onError { error ->
+//                    val errorMessage = error.message ?: "Failed to create note"
+//                    setState {
+//                        HomeContract.State(
+//                            voiceState = HomeContract.VoiceState.Idle,
+//                            error = errorMessage
+//                        )
+//                    }
+//                    sendEffect(HomeContract.Effect.ShowError(errorMessage))
+//                }
+//        }
     }
 
     private fun getSuccessMessage(): String {
@@ -226,7 +237,7 @@ class HomeViewModel @Inject constructor(
 
     private fun stopVoiceRecognition() {
         voiceRecognitionJob?.cancel()
-        voiceRecognitionRepository.stopListening()
+        voiceRecognitionRepository.finishListening()
         setState { HomeContract.State(voiceState = HomeContract.VoiceState.Idle) }
     }
 
@@ -250,10 +261,6 @@ class HomeViewModel @Inject constructor(
 
     private fun clearTranscription() {
         setState { HomeContract.State(transcribedText = "", error = null) }
-    }
-
-    private fun navigateToNotesList() {
-        sendEffect(HomeContract.Effect.NavigateToNotesList)
     }
 
     private fun loadRecentNotes() {
@@ -301,7 +308,7 @@ class HomeViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         voiceRecognitionJob?.cancel()
-        voiceRecognitionRepository.stopListening()
+        voiceRecognitionRepository.finishListening()
     }
 
     fun getGreeting(): String {

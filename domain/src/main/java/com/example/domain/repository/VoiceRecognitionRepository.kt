@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface VoiceRecognitionRepository {
     fun startListening(language: Language): Flow<VoiceRecognitionResult>
+    fun finishListening()
     fun stopListening()
     fun isListening(): Boolean
 }

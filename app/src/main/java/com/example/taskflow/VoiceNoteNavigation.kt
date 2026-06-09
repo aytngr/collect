@@ -29,7 +29,8 @@ fun VoiceNoteNavigation(navController: NavHostController) {
             HomeScreen(
                 onNavigateToNotesList = {
                     navController.navigate("notes_list")
-                }
+                },
+                onNavigateToNoteDetail = { id -> navController.navigate(NoteDetail(id)) }
             )
         }
 
@@ -47,6 +48,9 @@ fun VoiceNoteNavigation(navController: NavHostController) {
         composable<NoteDetail> { backStackEntry ->
             val route: NoteDetail = backStackEntry.toRoute()
             NoteDetailScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
                 itemId = route.noteId
             )
         }

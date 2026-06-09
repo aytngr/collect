@@ -22,10 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesUseCase,
-    private val createNoteUseCase: CreateNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val updateNotesUseCase: UpdateNotesUseCase,
-    private val updateNoteUseCase: UpdateNoteUseCase,
 ) : BaseViewModel<NoteListContract.Intent, NoteListContract.State, NoteListContract.Effect>(
     NoteListContract.State()
 ) {
@@ -55,14 +53,14 @@ class NoteListViewModel @Inject constructor(
 
     private fun combineNotes(draggedNote: Note, targetNote: Note) {
         viewModelScope.launch {
-            val combinedContent = "${targetNote.content}${draggedNote.title}${draggedNote.content}"
+//            val combinedContent = "${targetNote.content}${draggedNote.title}${draggedNote.content}"
             val combinedImages = targetNote.images.orEmpty() + draggedNote.images.orEmpty()
 
             // Create combined note
 //            deleteNoteUseCase(targetNote)
 //            createNoteUseCase(title = targetNote.title, combinedContent, combinedImages, Language.AZERBAIJANI)
             //Update target note
-            updateNoteUseCase.invoke(note = targetNote, title = targetNote.title, content = combinedContent, images = combinedImages, language = targetNote.language)
+//            updateNoteUseCase.invoke(note = targetNote, title = targetNote.title, content = combinedContent, images = combinedImages, language = targetNote.language)
             deleteNoteUseCase(draggedNote)
         }
     }
@@ -189,7 +187,7 @@ class NoteListViewModel @Inject constructor(
         // Filter by search query
         if (searchQuery.isNotBlank()) {
             filtered = filtered.filter {
-                it.content.contains(searchQuery, ignoreCase = true)
+                it.title.contains(searchQuery, ignoreCase = true)
             }
         }
 

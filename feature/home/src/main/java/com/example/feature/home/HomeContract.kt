@@ -14,7 +14,7 @@ class HomeContract {
         data class ProcessVoiceResult(val text: String) : Intent()
         object RetryVoiceRecognition : Intent()
         object ClearTranscription : Intent()
-        object NavigateToNotesList : Intent()
+        object CreateNewNote : Intent()
     }
 
     data class State(
@@ -32,7 +32,7 @@ class HomeContract {
 
     sealed class Effect : BaseEffect {
         data class ShowToast(val message: String) : Effect()
-        object NavigateToNotesList : Effect()
+        data class NavigateToNoteDetail(val id: Long) : Effect()
         data class ShowError(val error: String) : Effect()
         object RequestMicrophonePermission : Effect()
     }

@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.compose.navigation)
     implementation(libs.compose.material.icons)
 
+    implementation(libs.lottie.compose)
+
 
     implementation(project(":domain"))
     implementation(project(":core:designsystem"))
