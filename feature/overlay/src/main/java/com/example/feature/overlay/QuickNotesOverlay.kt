@@ -1,8 +1,10 @@
 package com.example.feature.overlay
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,11 +20,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,31 +46,57 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.example.core.designsystem.theme.AppShapes
+import com.example.core.designsystem.theme.AppTextStyle
+import com.example.core.designsystem.theme.AppTextStyle.DetailHeadline
+import com.example.core.designsystem.theme.AppTextStyle.NoteBody
+import com.example.core.designsystem.theme.AppTextStyle.NoteTitle
+import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Sub
+import com.example.core.designsystem.theme.TaskFlowTheme
+import com.example.core.ui.AppCircle
+import com.example.core.ui.HorizontalSpacer
+import com.example.core.ui.R
+import com.example.core.ui.ReminderSheet
+import com.example.core.ui.ReminderSheetContent
+import com.example.core.ui.VerticalSpacer
+import com.example.core.ui.WeightSpacer
+import com.example.core.ui.noRippleClickable
+import com.example.domain.models.NoteCategory
 import com.example.domain.models.SaveStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun QuickNotesOverlay(
     text: String,
-    onSave: suspend (String, List<Bitmap?>?, (SaveStatus) -> Unit) -> Unit,
+    category: String,
+    reminderAt: Long?,
+    onSave: suspend (String, List<String?>?, (SaveStatus) -> Unit) -> Unit,
+    onTextChange: (String) -> Unit,
+    onRemoveScreenshot: (Int) -> Unit,
     onClose: () -> Unit,
+    onSetReminder: (Long) -> Unit,
+    onRemoveReminder: () -> Unit,
     onHide: () -> Unit,
-    onScreenshot: (String, List<Bitmap>?) -> Unit,
-    screenshots: List<Bitmap>? = null,
+    onAddScreenshot: () -> Unit,
+    onClickCategory: () -> Unit,
+    screenshots: List<String>? = null,
 ) {
     var showImagePreview by remember { mutableIntStateOf(-1) }
-    var currentScreenshots by remember(screenshots) { mutableStateOf(screenshots?.toList())}
-    var text by remember { mutableStateOf(text) }
+    var showReminderSheet by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .clip(RoundedCornerShape(16.dp)),
+        color = AppTheme.colors.bg
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             var saveStatus by remember { mutableStateOf<SaveStatus?>(null) }
@@ -81,58 +109,133 @@ fun QuickNotesOverlay(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+                verticalAlignment = Alignment.CenterVertically,
+
+                ) {
+                AppCircle()
+                HorizontalSpacer(8.dp)
                 Text(
-                    text = "Quick Note",
-                    style = MaterialTheme.typography.titleLarge
+                    text = "Collect",
+                    style = NoteBody
                 )
-                IconButton(onClick = {
-                    onHide()
-                }) {
+                HorizontalSpacer(8.dp)
+                Text(
+                    "·",
+                    color = AppTheme.colors.faint
+                )
+                HorizontalSpacer(4.dp)
+                Text(
+                    text = "quick capture",
+                    style = AppTextStyle.Metadata,
+                    color = AppTheme.colors.faint
+                )
+                WeightSpacer()
+                IconButton(
+                    onClick = { onHide() },
+                    Modifier
+                        .clip(CircleShape)
+                        .background(AppTheme.colors.surfaceAlt)
+                        .size(36.dp)
+                        .padding(4.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
+                        painter = painterResource(R.drawable.arrow_up_right),
+                        contentDescription = "Screenshot"
+                    )
+                }
+
+                HorizontalSpacer(4.dp)
+                IconButton(
+                    onClick = onHide,
+                    Modifier
+                        .clip(CircleShape)
+                        .background(AppTheme.colors.surfaceAlt)
+                        .size(36.dp)
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.minimize),
+                        contentDescription = "Screenshot"
+                    )
+                }
+
+                HorizontalSpacer(4.dp)
+                IconButton(
+                    onClick = onClose,
+                    Modifier
+                        .clip(CircleShape)
+                        .background(AppTheme.colors.surfaceAlt)
+                        .size(36.dp)
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.x),
                         contentDescription = "Screenshot"
                     )
                 }
             }
 
-            LazyRow (
+
+            VerticalSpacer(8.dp)
+
+            BasicTextField(
+
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = NoteBody,
+                value = text,
+                onValueChange = onTextChange,
+                maxLines = 2,
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (text.isEmpty()) {
+                            Text(
+                                text = "Here...",
+                                style = NoteBody,
+                                color = AppTheme.colors.faint
+                            )
+                        }
+                        innerTextField()
+                    }
+                })
+
+
+            VerticalSpacer(8.dp)
+
+            LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                currentScreenshots?.let {
+            ) {
+                screenshots?.let {
                     itemsIndexed(it) { index, screenshot ->
-                        Box(modifier = Modifier.size(width = 70.dp, height = 110.dp)){
-                            Image(
-                                bitmap = screenshot.asImageBitmap(),
+
+                        Box(Modifier.clip(AppShapes.small)) {
+                            AsyncImage(
+                                model = File(screenshot),
                                 contentDescription = "Screenshot",
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .size(width = 60.dp, height = 100.dp)
-                                    .clickable { showImagePreview = index }
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.FillBounds
+                                    .size(100.dp)
+                                    .clip(AppShapes.small)
+                                    .noRippleClickable() { showImagePreview = index },
+                                contentScale = ContentScale.Crop,
+                                onError = {
+                                    Log.e(
+                                        "noteimg",
+                                        "load failed: $screenshot",
+                                        it.result.throwable
+                                    )
+                                },
                             )
+
                             Box(
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier
+                                    .size(28.dp)
                                     .align(Alignment.TopEnd)
                                     .clickable(onClick = {
-                                        // Remove by index — safe and reliable
-                                        currentScreenshots = it.filterIndexed { i, _ -> i != index }.toMutableList()
-                                        // If now empty, set to null to hide previews properly
-                                        if (currentScreenshots.isNullOrEmpty()) {
-                                            currentScreenshots = null
-                                        }
-                                        // Adjust preview index if needed
-                                        if (showImagePreview >= (currentScreenshots?.size ?: 0)) {
-                                            showImagePreview = -1
-                                        }
+                                        onRemoveScreenshot(index)
                                     })
-                                    .clip(CircleShape).
-                                background(Color.White)
+                                    .clip(CircleShape)
+                                    .background(Color.White)
                             ) {
                                 Icon(
                                     modifier = Modifier.padding(5.dp),
@@ -145,43 +248,112 @@ fun QuickNotesOverlay(
 
                     }
                 }
-                item {
-                    IconButton(onClick = {
-                        onScreenshot(text, currentScreenshots)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = "Screenshot"
-                        )
-                    }
-                }
             }
 
-            Spacer(Modifier.height(8.dp))
+            if(showReminderSheet){
+                VerticalSpacer(8.dp)
+                ReminderSheet(
+                    currentReminderAt = reminderAt,
+                    onSet = onSetReminder,
+                    onRemove = onRemoveReminder,
+                    onDismiss = {},
+                    forQuickNoteOverlay = true
+                )
+            }
 
-            OutlinedTextField(value = text, onValueChange = { text = it }, label = { Text("Note") })
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                TextButton(onClick = onClose) { Text("Close") }
-                Button(onClick = {
-                    coroutineScope.launch {
-                        onSave(text, currentScreenshots) {
-                            saveStatus = it
-                            if(it == SaveStatus.SUCCESS){
-                                text = ""
-                                currentScreenshots = emptyList()
+            VerticalSpacer(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    modifier = Modifier
+                        .border(
+                            width = 1.dp,
+                            shape = CircleShape,
+                            color = AppTheme.colors.line
+                        )
+                        .size(36.dp)
+                        .padding(10.dp), onClick = {
+                        onAddScreenshot()
+                    }) {
+                    Icon(
+                        painter = painterResource(R.drawable.camera),
+                        tint = AppTheme.colors.sub,
+                        contentDescription = "Screenshot"
+                    )
+                }
+                HorizontalSpacer(8.dp)
+                IconButton(
+                    modifier = Modifier
+                        .border(
+                            width = 1.dp,
+                            shape = CircleShape,
+                            color = AppTheme.colors.line
+                        )
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(color = if (reminderAt != null) AppTheme.colors.accent else Color.Transparent)
+                        .padding(10.dp),
+                    onClick = {
+                        showReminderSheet = !showReminderSheet
+                    }) {
+                    Icon(
+                        painter = painterResource(R.drawable.bell),
+                        tint = if (reminderAt != null) Color.White else AppTheme.colors.sub,
+                        contentDescription = "Screenshot"
+                    )
+                }
+                HorizontalSpacer(8.dp)
+                Row(
+                    modifier = Modifier
+                        .border(1.dp, AppTheme.colors.line, shape = AppShapes.large)
+                        .clip(AppShapes.large)
+                        .clickable { onClickCategory() }
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.tag),
+                        tint = AppTheme.colors.sub,
+                        contentDescription = "Screenshot",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    HorizontalSpacer(4.dp)
+                    Text(
+                        text = category.lowercase().replaceFirstChar { it.uppercase() },
+                        style = AppTextStyle.BodySnippet,
+                        color = AppTheme.colors.sub
+                    )
+                }
+
+
+                WeightSpacer()
+
+                IconButton(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(
+                            color = AppTheme.colors.accent
+                        ),
+                    onClick = {
+                        coroutineScope.launch {
+                            onSave(text, screenshots) {
+                                saveStatus = it
                             }
+                            delay(1000)
+                            saveStatus = null
                         }
-                        delay(1000)
-                        saveStatus = null
-                    }
-                }) {
-                    Text("Save")
+                    }) {
+                    Icon(
+                        painter = painterResource(R.drawable.arrow_up),
+                        tint = Color.White,
+                        contentDescription = "Screenshot"
+                    )
                 }
             }
         }
     }
-    if (showImagePreview != -1 && currentScreenshots != null) {
+    if (showImagePreview != -1 && screenshots != null) {
         Box(
             modifier = Modifier
                 .background(Color.Black.copy(alpha = 0.9f))
@@ -191,8 +363,8 @@ fun QuickNotesOverlay(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    bitmap = currentScreenshots!![showImagePreview].asImageBitmap(),
+                AsyncImage(
+                    model = File(screenshots!![showImagePreview]),
                     contentDescription = "Full Screenshot",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
@@ -210,12 +382,23 @@ fun QuickNotesOverlay(
 
 @Preview
 @Composable
-fun QuickNotes(){
-    QuickNotesOverlay(
-        text = "Hello",
-        onSave = {_,_,_ ->},
-        onClose = {},
-        onHide = {},
-        onScreenshot = {_,_ ->}
-    )
+fun QuickNotes() {
+    TaskFlowTheme {
+        QuickNotesOverlay(
+            text = "Hello",
+            onSave = { _, _, _ -> },
+            onClose = {},
+            onHide = {},
+            onTextChange = {},
+            onRemoveScreenshot = {},
+            onAddScreenshot = {},
+            screenshots = emptyList(),
+            category = NoteCategory.GENERAL.name,
+            onClickCategory = {},
+            reminderAt = null,
+            onSetReminder = {},
+            onRemoveReminder = {}
+        )
+    }
+
 }

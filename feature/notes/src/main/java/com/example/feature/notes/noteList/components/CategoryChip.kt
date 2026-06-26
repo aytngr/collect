@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.core.designsystem.theme.AppShapes
+import com.example.core.designsystem.theme.AppTextStyle
+import com.example.core.designsystem.theme.AppTheme
 import com.example.domain.models.NoteCategory
 
 @Composable
@@ -20,21 +25,44 @@ fun CategoryChip(
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             FilterChip(
                 selected = selectedCategory == null,
                 onClick = { onCategorySelected(null) },
-                label = { Text("All") }
+                label = { Text("All", style = AppTextStyle.Chip) },
+                shape = AppShapes.extraLarge,
+                colors = FilterChipDefaults.filterChipColors(
+                    labelColor = AppTheme.colors.sub,
+                    selectedContainerColor = AppTheme.colors.accent,
+                    selectedLabelColor = Color.White,
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedCategory == null,
+                    borderColor = AppTheme.colors.line,
+                    selectedBorderColor = Color.Transparent,
+                )
             )
         }
         items(NoteCategory.entries.toTypedArray()) { category ->
             FilterChip(
                 selected = selectedCategory == category,
                 onClick = { onCategorySelected(category) },
-                label = { (Text(category.name.lowercase().replaceFirstChar { it.uppercase() })) }
+                label = { (Text(category.name.lowercase().replaceFirstChar { it.uppercase() }, style = AppTextStyle.Chip)) },
+                shape = AppShapes.extraLarge,
+                colors = FilterChipDefaults.filterChipColors(
+                    labelColor = AppTheme.colors.sub,
+                    selectedContainerColor = AppTheme.colors.accent,
+                    selectedLabelColor = Color.White
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedCategory == category,
+                    borderColor = AppTheme.colors.line,
+                    selectedBorderColor = Color.Transparent,
+                )
             )
         }
     }

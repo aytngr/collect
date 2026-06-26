@@ -18,6 +18,10 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationCompat
@@ -34,7 +38,9 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.domain.models.Language
+import com.example.domain.models.NoteCategory
 import com.example.domain.models.SaveStatus
 import com.example.domain.models.onError
 import com.example.domain.models.onSuccess
@@ -49,6 +55,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,8 +67,10 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     private var screenshotAnimationView: ComposeView? = null
     var isQuickNoteAdded = false
 
-    private var currentText = ""
-    private var currentScreenshots: MutableList<Bitmap>? = mutableListOf<Bitmap>()
+    private var currentText by mutableStateOf("")
+    private var reminderAt by mutableStateOf<Long?>(null)
+    private var category by mutableStateOf(NoteCategory.GENERAL)
+    private val currentScreenshots = mutableStateListOf<String>()
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val store = ViewModelStore()
@@ -87,6 +96,9 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         const val ACTION_SCREENSHOT_PERMISSION_DENIED = "action_screenshot_permission_denied"
         const val EXTRA_RESULT_CODE = "extra_result_code"
         const val EXTRA_RESULT_DATA = "extra_result_data"
+
+        var isRunning = false
+            private set
     }
 
 
@@ -130,6 +142,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
         createOverlayWidget()
+
+        isRunning = true
     }
 
     private fun createOverlayWidget() {
@@ -240,21 +254,35 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 setViewTreeSavedStateRegistryOwner(this@OverlayService)
 
                 setContent {
-                    QuickNotesOverlay(
-                        text = currentText,
-                        onSave = ::saveNoteToDatabase,
-                        onClose = { removeQuickNotePopup() },
-                        onHide = { hideQuickNotePopup() },
-                        onScreenshot = { text, screenshots ->
-                            currentScreenshots = screenshots?.toMutableList()
-                            currentText = text
-                            ScreenshotActivity.start(
-                                this@OverlayService,
-                                screenshotManager?.getMediaProjection()
-                            )
-                        },
-                        screenshots = currentScreenshots
-                    )
+                    TaskFlowTheme {
+                        QuickNotesOverlay(
+                            text = currentText,
+                            category = category.name,
+                            onClickCategory = {
+                                val next =
+                                    NoteCategory.entries[(category.ordinal + 1) % NoteCategory.entries.size]
+                                category = next
+                            },
+                            onSave = ::saveNoteToDatabase,
+                            onTextChange = { currentText = it },
+                            onRemoveScreenshot = { i ->
+                                File(currentScreenshots[i]).delete()
+                                currentScreenshots.removeAt(i)
+                            },
+                            onClose = { removeQuickNotePopup() },
+                            onHide = { hideQuickNotePopup() },
+                            onAddScreenshot = {
+                                ScreenshotActivity.start(
+                                    this@OverlayService,
+                                    screenshotManager?.getMediaProjection()
+                                )
+                            },
+                            screenshots = currentScreenshots,
+                            reminderAt = reminderAt,
+                            onRemoveReminder = { reminderAt = null },
+                            onSetReminder = { reminderAt = it }
+                        )
+                    }
                 }
             }
 
@@ -268,7 +296,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 WindowManager.LayoutParams.FLAG_DIM_BEHIND,
                 PixelFormat.TRANSLUCENT
             ).apply {
-                gravity = Gravity.CENTER
+                gravity = Gravity.BOTTOM
                 dimAmount = 0.5f
             }
 
@@ -291,29 +319,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 delay(250)
                 hideScreenshotAnimation()
                 val screenshot = screenshotManager?.captureScreenshot()
-                withContext(Dispatchers.Main) {
-                    if (screenshot != null) {
-                        // Recompose QuickNotesOverlay with new parameters
-                        (quickNoteView as ComposeView).setContent {
-                            QuickNotesOverlay(
-                                text = currentText,
-                                screenshots = (currentScreenshots.orEmpty() + screenshot),
-                                onSave = ::saveNoteToDatabase,
-                                onHide = { hideQuickNotePopup() },
-                                onClose = { removeQuickNotePopup() },
-                                onScreenshot = { text, screenshots ->
-                                    currentText = text
-                                    currentScreenshots = screenshots?.toMutableList()
-                                    ScreenshotActivity.start(
-                                        this@OverlayService,
-                                        screenshotManager?.getMediaProjection()
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-
+                val path = screenshot?.saveToStorage(this@OverlayService)
+                path?.let{currentScreenshots.add(it)}
                 widgetView?.visibility = VISIBLE
                 showQuickNotePopup()
             } finally {
@@ -367,25 +374,33 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
     private suspend fun saveNoteToDatabase(
         noteText: String,
-        images: List<Bitmap?>?,
+        images: List<String?>?,
         onSaveStatus: (SaveStatus) -> Unit
     ) {
-//        createNoteUseCase(
-//            title = null,
-//            content = noteText,
-//            images = images?.map { it?.saveToStorage(this) },
-//            language = Language.AZERBAIJANI
-//        )
-//            .onSuccess {
-//                onSaveStatus(SaveStatus.SUCCESS)
-//            }
-//            .onError {
-//                onSaveStatus(SaveStatus.ERROR)
-//            }
+        createNoteUseCase(
+            title = null,
+            content = noteText,
+            images = images,
+            reminderAt = reminderAt,
+            language = Language.AZERBAIJANI
+        )
+            .onSuccess {
+                onSaveStatus(SaveStatus.SUCCESS)
+                currentText = ""
+                currentScreenshots.clear()
+            }
+            .onError {
+                onSaveStatus(SaveStatus.ERROR)
+            }
     }
 
     private fun removeQuickNotePopup() {
-        currentScreenshots = mutableListOf<Bitmap>()
+        currentScreenshots.forEach {
+            File(it).delete()
+        }
+        currentText = ""
+        reminderAt = null
+        currentScreenshots.clear()
         windowManager.removeView(quickNoteView)
         isQuickNoteAdded = false
     }
@@ -411,6 +426,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         store.clear()
         coroutineScope.cancel()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+        isRunning = false
     }
 
     override fun onBind(intent: Intent): IBinder? {

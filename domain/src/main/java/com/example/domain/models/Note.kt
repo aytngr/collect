@@ -2,21 +2,31 @@ package com.example.domain.models
 
 data class Note(
     val id: Long = 0,
-    val textBlocks: List<TextBlock> = listOf(),
+    val content: String ="",
     val title: String = "",
+    val images: List<String?>? = null,
+
     val category: NoteCategory = NoteCategory.GENERAL,
+    val isCategoryManual: Boolean = false,
     val language: Language = Language.AZERBAIJANI,
-    val createdAt: Long = System.currentTimeMillis(),
-    val timePassed: String = "",
     val extractedData: Map<String, String> = emptyMap(),
+
+    val ocrText: String = "",
+    val sourceApp: String? = null,
+
+    val reminderAt: Long? = null,
+
+
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
     val orderN: Int = 0,
-    val isRevealed: Boolean = false,
-    val isFav: Boolean = false,
-    val images: List<String?>? = null
+    val isPinned: Boolean = false,
+
+//    val isRevealed: Boolean = false
 )
 
 enum class NoteCategory {
-    GENERAL, SHOPPING, REMINDER, WORK
+    GENERAL, SHOPPING, FINANCE, WORK, SAVED
 }
 
 enum class Language(val code: String, val displayName: String) {

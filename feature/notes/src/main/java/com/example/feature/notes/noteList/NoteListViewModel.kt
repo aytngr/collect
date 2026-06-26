@@ -1,8 +1,5 @@
 package com.example.feature.notes.noteList
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.core.common.base.BaseViewModel
 import com.example.domain.models.Language
@@ -13,7 +10,6 @@ import com.example.domain.models.onSuccess
 import com.example.domain.usecase.CreateNoteUseCase
 import com.example.domain.usecase.DeleteNoteUseCase
 import com.example.domain.usecase.GetNotesUseCase
-import com.example.domain.usecase.UpdateNoteUseCase
 import com.example.domain.usecase.UpdateNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,14 +20,10 @@ class NoteListViewModel @Inject constructor(
     private val getNotesUseCase: GetNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val updateNotesUseCase: UpdateNotesUseCase,
+    private val createNoteUseCase: CreateNoteUseCase,
 ) : BaseViewModel<NoteListContract.Intent, NoteListContract.State, NoteListContract.Effect>(
     NoteListContract.State()
 ) {
-
-    var noteList by mutableStateOf(emptyList<Note>())
-        private set
-
-    var reorderUpdate = false;
 
     init {
         handleIntent(NoteListContract.Intent.LoadNotes)
@@ -43,55 +35,75 @@ class NoteListViewModel @Inject constructor(
             is NoteListContract.Intent.DeleteNote -> deleteNote(intent.note)
             is NoteListContract.Intent.FilterByCategory -> filterByCategory(intent.noteCategory)
             NoteListContract.Intent.LoadNotes -> loadNotes()
-            is NoteListContract.Intent.HandleExpandedNotes -> handleExpandedNotes(intent.expandedNote)
             is NoteListContract.Intent.SearchNote -> searchNotes(intent.query)
-            is NoteListContract.Intent.CombineNotes -> combineNotes(intent.draggedNote, intent.targetNote)
-            is NoteListContract.Intent.ReorderNotes -> reorderNotes(intent.fromNote, intent.toNote)
-            is NoteListContract.Intent.UpdateNotesWithOrder -> onDragEnd()
+            NoteListContract.Intent.ClearSelection -> clearSelection()
+            NoteListContract.Intent.DeleteSelected -> deleteSelection()
+            is NoteListContract.Intent.LongPressNote -> longPressNote(intent.id)
+            is NoteListContract.Intent.ToggleSelect -> toggleSelect(intent.id)
+            NoteListContract.Intent.SelectAll -> selectAll()
+            NoteListContract.Intent.PinSelected -> pinSelected()
+            is NoteListContract.Intent.MoveSelected -> moveSelected(intent.category)
+            NoteListContract.Intent.CombineSelected -> combineSelected()
         }
     }
 
-    private fun combineNotes(draggedNote: Note, targetNote: Note) {
+    private fun selectAll(){
+        setState { copy(selectedIds = selectedIds + notes.map { it.id }) }
+    }
+    private fun deleteSelection() {
         viewModelScope.launch {
-//            val combinedContent = "${targetNote.content}${draggedNote.title}${draggedNote.content}"
-            val combinedImages = targetNote.images.orEmpty() + draggedNote.images.orEmpty()
-
-            // Create combined note
-//            deleteNoteUseCase(targetNote)
-//            createNoteUseCase(title = targetNote.title, combinedContent, combinedImages, Language.AZERBAIJANI)
-            //Update target note
-//            updateNoteUseCase.invoke(note = targetNote, title = targetNote.title, content = combinedContent, images = combinedImages, language = targetNote.language)
-            deleteNoteUseCase(draggedNote)
+            currentState.notes
+                .filter { it.id in currentState.selectedIds }
+                .forEach { deleteNoteUseCase(it) }
+            sendEffect(NoteListContract.Effect.ShowToast("Notes deleted"))
+            clearSelection()
         }
     }
 
-    private fun reorderNotes(fromNote: Long, toNote: Long) {
+    private fun pinSelected() {
         viewModelScope.launch {
-            val from = noteList.indexOfFirst { it.id == fromNote }
-            val to = noteList.indexOfFirst { it.id == toNote }
-            if (from != -1 && to != -1) {
-                noteList = noteList.toMutableList().apply { add(to, removeAt(from)) }
-
-                setState {
-                    copy(
-                        notes = noteList,
-                        filteredNotes = applyFilters(
-                            noteList,
-                            currentState.selectedCategory,
-                            currentState.searchQuery
-                        )
-                    )
-                }
-            }
+            val selected = currentState.notes.filter { it.id in currentState.selectedIds }
+            if (selected.isEmpty()) return@launch
+            val pin = selected.any { !it.isPinned }
+            updateNotesUseCase(selected.map { it.copy(isPinned = pin) })
+            clearSelection()
         }
     }
 
-
-    fun onDragEnd() {
+    private fun moveSelected(category: NoteCategory) {
+        val moved = currentState.notes.filter { it.id in currentState.selectedIds }.map { note ->  note.copy(category = category, isCategoryManual = true) }
         viewModelScope.launch {
-            val updated = noteList.mapIndexed { index, note -> note.copy(orderN = index) }
-            reorderUpdate = true
-            updateNotesUseCase.invoke(updated)
+            updateNotesUseCase(moved)
+        }
+        clearSelection()
+    }
+
+    private fun combineSelected() {
+        val selected = currentState.notes.filter { it.id in currentState.selectedIds }
+        val content = selected.joinToString("\n\n") { "${it.title}\n${it.content}"  }
+        val images = selected.flatMap { it.images.orEmpty() }
+
+        viewModelScope.launch {
+            createNoteUseCase("", content, images, Language.AZERBAIJANI)
+            selected.forEach { deleteNoteUseCase(it) }
+        }
+
+        clearSelection()
+    }
+
+    private fun clearSelection() {
+        setState { copy(selectionMode = false, selectedIds = emptySet()) }
+    }
+
+    private fun longPressNote(id: Long){
+        setState {
+            copy(selectionMode = true, selectedIds = selectedIds + id)
+        }
+    }
+    private fun toggleSelect(id: Long){
+        setState {
+            val next = if (id in selectedIds) selectedIds - id else selectedIds + id
+            copy(selectedIds = next, selectionMode = next.isNotEmpty())
         }
     }
 
@@ -99,35 +111,19 @@ class NoteListViewModel @Inject constructor(
         setState { copy(isLoading = true, error = null) }
         viewModelScope.launch {
             getNotesUseCase.invoke()
-                .collect { notes ->
-                    notes.onSuccess {
-                        if(!reorderUpdate){
-                            noteList = it.mapIndexed { index, note -> note.copy(orderN = index)}
-                            setState {
-                                copy(
-                                    notes = it,
-                                    filteredNotes = applyFilters(
-                                        it,
-                                        category = currentState.selectedCategory,
-                                        searchQuery = currentState.searchQuery
-                                    ),
-                                    isLoading = false
-                                )
-                            }
+                .collect { result ->
+                    result.onSuccess { notes ->
+                        setState {
+                            copy(
+                                notes = notes,
+                                filteredNotes = applyFilters(notes, selectedCategory, searchQuery),
+                                isLoading = false
+                            )
                         }
-                        reorderUpdate = false
                     }.onError {
                         setState { copy(isLoading = false, error = it.message) }
                     }
                 }
-        }
-    }
-
-    private fun handleExpandedNotes(expandedNote: Note) {
-        setState {
-            copy(filteredNotes = currentState.filteredNotes.map {
-                if (it.id == expandedNote.id) it.copy(isRevealed = true) else it.copy(isRevealed = false)
-            })
         }
     }
 
@@ -145,7 +141,7 @@ class NoteListViewModel @Inject constructor(
         setState {
             copy(
                 selectedCategory = category,
-                filteredNotes = applyFilters(currentState.notes, category, currentState.searchQuery)
+                filteredNotes = applyFilters(notes, category, searchQuery)
             )
         }
     }
@@ -154,11 +150,7 @@ class NoteListViewModel @Inject constructor(
         setState {
             copy(
                 searchQuery = query,
-                filteredNotes = applyFilters(
-                    currentState.notes,
-                    currentState.selectedCategory,
-                    query
-                )
+                filteredNotes = applyFilters(notes, selectedCategory, query)
             )
         }
     }
@@ -167,7 +159,7 @@ class NoteListViewModel @Inject constructor(
         setState {
             copy(
                 searchQuery = "",
-                filteredNotes = applyFilters(currentState.notes, currentState.selectedCategory, "")
+                filteredNotes = applyFilters(notes, selectedCategory, "")
             )
         }
     }
@@ -179,19 +171,16 @@ class NoteListViewModel @Inject constructor(
     ): List<Note> {
         var filtered = notes
 
-        // Filter by category
         if (category != null) {
             filtered = filtered.filter { it.category == category }
         }
-
-        // Filter by search query
         if (searchQuery.isNotBlank()) {
-            filtered = filtered.filter {
-                it.title.contains(searchQuery, ignoreCase = true)
-            }
+            filtered = filtered.filter { it.title.contains(searchQuery, ignoreCase = true) }
         }
 
-        return filtered
+        // pinned first, then most-recently edited
+        return filtered.sortedWith(
+            compareByDescending<Note> { it.isPinned }.thenByDescending { it.updatedAt }
+        )
     }
-
 }

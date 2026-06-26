@@ -57,6 +57,10 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
+    implementation(libs.coil.compose)
+
 
     implementation(project(":domain"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
 }

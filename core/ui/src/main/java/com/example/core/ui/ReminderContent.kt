@@ -1,0 +1,296 @@
+package com.example.core.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.core.designsystem.theme.AppShapes
+import com.example.core.designsystem.theme.AppTextStyle
+import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.TaskFlowTheme
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+@Composable
+fun ReminderSheetContent(
+    currentReminderAt: Long?,
+    day: LocalDate?,
+    time: LocalTime?,
+    onDay: (LocalDate) -> Unit,
+    onTime: (LocalTime?) -> Unit,
+    onPickDate: () -> Unit,
+    onPickTime: () -> Unit,
+    onSet: (Long) -> Unit,
+    onRemove: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    forQuickNoteOverlay: Boolean = false
+) {
+    val result = if (day != null && time != null) combine(day, time) else null
+
+    if (forQuickNoteOverlay) {
+        LaunchedEffect(result) {
+            if (result != null) onSet(result)
+        }
+        LaunchedEffect(day) {
+            if(day != null && time != null && combine(
+                day,
+                time
+            ) < System.currentTimeMillis())
+                onTime(null)
+        }
+    }
+
+    Column(
+        modifier
+            .background(color = if (forQuickNoteOverlay) AppTheme.colors.surfaceAlt else AppTheme.colors.bg)
+            .padding(16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(R.drawable.bell),
+                contentDescription = "",
+                tint = AppTheme.colors.accent
+            )
+            HorizontalSpacer(8.dp)
+            Text("Remind me", style = AppTextStyle.NoteTitle)
+            WeightSpacer()
+            if (forQuickNoteOverlay) TextButton(onClick = {
+                onRemove() }) {
+                Text(
+                    text = "Clear",
+                    style = AppTextStyle.Button,
+                    color = AppTheme.colors.sub
+                )
+            }
+        }
+
+        VerticalSpacer(12.dp)
+
+        Text("WHEN", style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ReminderChip(
+                "Today",
+                day == DayOption.TODAY.toDate()
+            ) { onDay(DayOption.TODAY.toDate()) }
+            ReminderChip(
+                "Tomorrow",
+                day == DayOption.TOMORROW.toDate()
+            ) { onDay(DayOption.TOMORROW.toDate()) }
+            ReminderChip(
+                "Weekend",
+                day == DayOption.WEEKEND.toDate()
+            ) { onDay(DayOption.WEEKEND.toDate()) }
+            ReminderChip(
+                "Next week",
+                day == DayOption.NEXT_WEEK.toDate()
+            ) { onDay(DayOption.NEXT_WEEK.toDate()) }
+            ReminderChip(
+                label = day?.takeIf { it.isCustom() }?.let(::dateLabel) ?: "Pick date…",
+                selected = day?.isCustom() == true,
+            ) { onPickDate() }
+        }
+
+        VerticalSpacer(12.dp)
+
+        Text("TIME", style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TimeOption.entries.forEach { opt ->
+                ReminderChip(
+                    label = opt.name.lowercase().replaceFirstChar { it.uppercase() },
+                    selected = time == opt.toTime() && (day != null && combine(
+                        day,
+                        opt.toTime()
+                    ) > System.currentTimeMillis()),
+                    enabled = !(day != null && combine(
+                        day,
+                        opt.toTime()
+                    ) <= System.currentTimeMillis()),
+                ) { onTime(opt.toTime()) }
+            }
+            ReminderChip(
+                label = time?.takeIf { it.isCustom() }?.let(::timeLabel) ?: "Pick time…",
+                selected = time?.isCustom() == true,
+            ) { onPickTime() }
+        }
+
+        VerticalSpacer(16.dp)
+
+        result?.let {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = AppTheme.colors.accent,
+                        shape = AppShapes.small
+                    )
+                    .clip(AppShapes.medium)
+                    .background(color = AppTheme.colors.accentSoft)
+                    .padding(12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(formatReminder(it), style = AppTextStyle.ReminderTitle)
+
+            }
+            VerticalSpacer(12.dp)
+        }
+
+        if(!forQuickNoteOverlay){
+            Row(Modifier.fillMaxWidth()) {
+                if (currentReminderAt != null) {
+                    TextButton(onClick = onRemove) {
+                        Text(
+                            "Remove",
+                            style = AppTextStyle.Button,
+                            color = AppTheme.colors.sub
+                        )
+                    }
+                } else {
+                    TextButton(onClick = onDismiss) {
+                        Text(
+                            "Cancel",
+                            style = AppTextStyle.Button,
+                            color = AppTheme.colors.sub
+                        )
+                    }
+                }
+                HorizontalSpacer(16.dp)
+                Button(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(AppShapes.medium),
+                    onClick = { result?.let(onSet) },
+                    enabled = result != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AppTheme.colors.accent
+                    )
+                ) { Text("Set", style = AppTextStyle.Button) }
+            }
+        }
+
+        VerticalSpacer(8.dp)
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReminderChip(
+    label: String,
+    selected: Boolean,
+    enabled: Boolean = true,
+    onSelect: () -> Unit,
+) {
+    FilterChip(
+        selected = selected,
+        enabled = enabled,
+        onClick = onSelect,
+        label = { Text(label, style = AppTextStyle.Chip) },
+        shape = AppShapes.small,
+        colors = FilterChipDefaults.filterChipColors(
+            labelColor = AppTheme.colors.sub,
+            selectedContainerColor = AppTheme.colors.accent,
+            selectedLabelColor = Color.White,
+        ),
+        border = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = selected,
+            borderColor = AppTheme.colors.line,
+            selectedBorderColor = Color.Transparent,
+        ),
+    )
+}
+
+private fun LocalDate.isCustom(): Boolean = DayOption.entries.none { it.toDate() == this }
+private fun LocalTime.isCustom(): Boolean = TimeOption.entries.none { it.toTime() == this }
+
+private fun dateLabel(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault()))
+
+private fun timeLabel(time: LocalTime): String =
+    time.format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
+
+private fun formatReminder(millis: Long): String =
+    Instant.ofEpochMilli(millis)
+        .atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("EEE, MMM d · h:mm a", Locale.getDefault()))
+
+
+@Preview(showBackground = true)
+@Composable
+private fun ReminderSheetContentPreview() {
+    TaskFlowTheme {
+        ReminderSheetContent(
+            currentReminderAt = null,
+            day = DayOption.TOMORROW.toDate(),
+            time = TimeOption.MORNING.toTime(),
+            onDay = {},
+            onTime = {},
+            onPickDate = {},
+            onPickTime = {},
+            onSet = {},
+            onRemove = {},
+            onDismiss = {},
+            forQuickNoteOverlay = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ReminderSheetContentEditingPreview() {
+    TaskFlowTheme {
+        ReminderSheetContent(
+            currentReminderAt = System.currentTimeMillis(),
+            day = LocalDate.now().plusDays(3),
+            time = LocalTime.of(7, 30),
+            onDay = {},
+            onTime = {},
+            onPickDate = {},
+            onPickTime = {},
+            onSet = {},
+            onRemove = {},
+            onDismiss = {},
+        )
+    }
+}

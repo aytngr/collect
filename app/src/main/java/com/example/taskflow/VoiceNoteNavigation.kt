@@ -1,5 +1,6 @@
 package com.example.taskflow
 
+import android.content.Intent
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import com.example.core.navigation.Notes
 import com.example.feature.home.HomeScreen
 import com.example.feature.note_detail.NoteDetailScreen
 import com.example.feature.notes.noteList.NoteListScreen
+import com.example.feature.overlay.OverlayService
 
 @Composable
 fun VoiceNoteNavigation(navController: NavHostController) {
@@ -28,9 +30,9 @@ fun VoiceNoteNavigation(navController: NavHostController) {
         composable<Home> {
             HomeScreen(
                 onNavigateToNotesList = {
-                    navController.navigate("notes_list")
+                    navController.navigate(Notes)
                 },
-                onNavigateToNoteDetail = { id -> navController.navigate(NoteDetail(id)) }
+                onNavigateToNoteDetail = { id -> navController.navigate(NoteDetail(id)) },
             )
         }
 
