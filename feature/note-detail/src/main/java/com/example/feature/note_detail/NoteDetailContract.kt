@@ -13,14 +13,19 @@ class NoteDetailContract {
         data class UpdateNote(val title: String? = null, val content: String? = null, val images: List<String>? = null): Intent()
         data object SaveNow : Intent()
         data object PinNote : Intent()
+        data object RefreshPermissionDialogVisibility : Intent()
+        data object CheckExactAlarmPermission : Intent()
         data class DeleteNote(val note: Note): Intent()
         data class SetReminder(val at: Long): Intent()
+        data class SetPendingReminder(val at: Long): Intent()
+        data object SchedulePendingReminder : Intent()
         data object ClearReminder : Intent()
     }
 
     data class State(
         val note: Note,
         val isLoading: Boolean = false,
+        val showExactAlarmPermissionDialog: Boolean = false,
         val createdTime: String = "",
         val reminder: String = "",
         val editedTime: String = "",

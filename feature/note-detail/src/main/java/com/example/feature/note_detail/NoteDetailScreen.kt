@@ -1,9 +1,11 @@
 package com.example.feature.note_detail
 
 import android.Manifest
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -62,6 +64,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -101,6 +104,8 @@ fun NoteDetailScreen(
         val obs = LifecycleEventObserver { _, e ->
             if (e == Lifecycle.Event.ON_STOP)
                 viewModel.handleIntent(NoteDetailContract.Intent.SaveNow)
+            if (e == Lifecycle.Event.ON_RESUME)
+                viewModel.handleIntent(NoteDetailContract.Intent.SchedulePendingReminder)
         }
         lifecycleOwner.lifecycle.addObserver(obs)
         onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
@@ -377,12 +382,44 @@ fun NoteDetailContent(
             ReminderSheet(
                 currentReminderAt = state.note.reminderAt,
                 onSet = {
-                    onIntent(NoteDetailContract.Intent.SetReminder(it)); showReminderSheet = false
+                    showReminderSheet = false
+                    onIntent(NoteDetailContract.Intent.SetPendingReminder(it))
+                    onIntent(NoteDetailContract.Intent.CheckExactAlarmPermission)
                 },
                 onRemove = {
                     onIntent(NoteDetailContract.Intent.ClearReminder); showReminderSheet = false
                 },
                 onDismiss = { showReminderSheet = false },
+            )
+
+        }
+
+        if (state.showExactAlarmPermissionDialog) {
+            AlertDialog(
+                onDismissRequest = { onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility) },
+                title = { Text("Give exact alarm permission") },
+                text = { Text("Give permission to receive notifications on time.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val intent = Intent(
+                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            "package:${context.packageName}".toUri()
+                        )
+                        context.startActivity(intent)
+                        onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility)
+                        onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
+                    }) {
+                        Text("Open settings")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility)
+                        onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
+                    }) {
+                        Text("Cancel")
+                    }
+                },
             )
         }
     }

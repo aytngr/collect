@@ -1,5 +1,6 @@
 package com.example.feature.note_detail
 
+import android.os.Build
 import androidx.lifecycle.viewModelScope
 import com.example.core.common.base.BaseViewModel
 import com.example.core.common.base.formatCreatedAt
@@ -37,6 +38,8 @@ class NoteDetailViewModel @Inject constructor(
 ) {
     private var saveJob: Job? = null
 
+    private var pendingReminder: Long? = null
+
     override fun handleIntent(intent: NoteDetailContract.Intent) {
         when (intent) {
             is NoteDetailContract.Intent.LoadNote -> loadNote(intent.id)
@@ -49,8 +52,26 @@ class NoteDetailViewModel @Inject constructor(
 
             NoteDetailContract.Intent.SaveNow -> persist()
             is NoteDetailContract.Intent.SetReminder -> setReminder(intent.at)
+            is NoteDetailContract.Intent.SetPendingReminder -> pendingReminder = intent.at
+            is NoteDetailContract.Intent.SchedulePendingReminder -> schedulePendingReminder()
             NoteDetailContract.Intent.ClearReminder -> clearReminder()
             NoteDetailContract.Intent.PinNote -> pinNote()
+            NoteDetailContract.Intent.CheckExactAlarmPermission -> checkExactAlarmPermission()
+            NoteDetailContract.Intent.RefreshPermissionDialogVisibility -> {
+                schedulePendingReminder()
+                setState { copy(showExactAlarmPermissionDialog = false) }
+            }
+        }
+    }
+
+    private fun schedulePendingReminder() {
+        pendingReminder?.let {
+            setReminder(it)
+        }
+    }
+    private fun checkExactAlarmPermission() {
+        if (!reminderScheduler.canExact()) {
+            setState { copy(showExactAlarmPermissionDialog = true) }
         }
     }
 
@@ -65,6 +86,7 @@ class NoteDetailViewModel @Inject constructor(
         persist()
         reminderScheduler.cancel(currentState.note.id)
     }
+
     private fun pinNote() {
         setState { copy(note = note.copy(isPinned = !note.isPinned)) }
     }
@@ -110,7 +132,7 @@ class NoteDetailViewModel @Inject constructor(
                             note = it,
                             createdTime = it.createdAt.formatCreatedAt(),
                             editedTime = formatEditedTime(it.updatedAt),
-                            reminder = it.reminderAt?.formatCreatedAt() ?: run {""}
+                            reminder = it.reminderAt?.formatCreatedAt() ?: run { "" }
                         )
                     }
                 }.onError {
