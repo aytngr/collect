@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 
 @Composable
 fun ReminderBox(
@@ -44,7 +45,7 @@ fun ReminderBox(
             .clip(AppShapes.medium)
             .background(if (isNext) AppTheme.colors.accent.copy(alpha = 0.04f) else Color.White)
             .noRippleClickable(onClick = {})
-            .padding(vertical = 16.dp, horizontal = 14.dp),
+            .padding(vertical = Spacing.lg, horizontal = Spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -69,7 +70,7 @@ fun ReminderBox(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = Spacing.md)
         ) {
             if(isDetail){
                 Text(text = title, style = AppTextStyle.Eyebrow, color = AppTheme.colors.accent)

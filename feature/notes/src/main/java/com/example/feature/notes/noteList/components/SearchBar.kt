@@ -27,6 +27,7 @@ import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.Faint
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.ui.HorizontalSpacer
 import com.example.core.ui.noRippleClickable
 import com.example.feature.notes.R
@@ -59,7 +60,7 @@ fun SearchBar(
                         color = if (isFocused) AppTheme.colors.accent else AppTheme.colors.faint,
                         shape = AppShapes.extraLarge
                     )
-                    .padding(horizontal = 14.dp, vertical = 10.dp) // ← your padding, no forced min height
+                    .padding(horizontal = Spacing.md, vertical = Spacing.md)
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -67,7 +68,7 @@ fun SearchBar(
                     tint = AppTheme.colors.faint,
                     modifier = Modifier.size(20.dp)
                 )
-                HorizontalSpacer(8.dp)
+                HorizontalSpacer(Spacing.sm)
                 Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                     if (query.isEmpty()) {
                         Text(stringResource(R.string.notes_search_placeholder), style = AppTextStyle.Chip, color = Faint)
@@ -75,7 +76,7 @@ fun SearchBar(
                     innerTextField()
                 }
                 if (query.isNotEmpty()) {
-                    HorizontalSpacer(8.dp)
+                    HorizontalSpacer(Spacing.sm)
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = stringResource(R.string.notes_clear_search_cd),

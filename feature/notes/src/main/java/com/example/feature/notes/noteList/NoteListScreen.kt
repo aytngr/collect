@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.Sub
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.core.ui.R
@@ -98,7 +100,8 @@ private fun NoteListContent(
         modifier = Modifier
             .fillMaxSize()
             .background(color = AppTheme.colors.bg)
-            .padding(16.dp)
+            .systemBarsPadding()
+            .padding(Spacing.screen)
     ) {
         if (state.selectionMode) {
             Row(
@@ -149,7 +152,7 @@ private fun NoteListContent(
             }
         }
 
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.lg)
         SearchBar(
             query = state.searchQuery,
             onQueryChange = { query ->
@@ -159,7 +162,7 @@ private fun NoteListContent(
                 onIntent(NoteListContract.Intent.ClearSearch)
             }
         )
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.sm)
         CategoryChip(
             selectedCategory = state.selectedCategory,
             onCategorySelected = { category ->
@@ -175,8 +178,7 @@ private fun NoteListContent(
             )
         }
 
-        VerticalSpacer(8.dp)
-
+        VerticalSpacer(Spacing.sm)
 
         if (state.isLoading) {
             Box(
@@ -219,7 +221,7 @@ private fun NoteListContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = Spacing.sm),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -276,7 +278,7 @@ private fun MoveCategoryPicker(
                         modifier = Modifier
                             .fillMaxWidth()
                             .noRippleClickable() { onPick(category) }
-                            .padding(vertical = 14.dp),
+                            .padding(vertical = Spacing.md),
                     )
                 }
             }
@@ -298,7 +300,7 @@ private fun SelectionAction(
     Column(
         modifier = modifier
             .noRippleClickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = Spacing.md, vertical = Spacing.xs),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
@@ -306,7 +308,7 @@ private fun SelectionAction(
             contentDescription = label,
             tint = AppTheme.colors.sub,
         )
-        VerticalSpacer(4.dp)
+        VerticalSpacer(Spacing.xs)
         Text(label, style = AppTextStyle.Metadata, color = AppTheme.colors.sub)
     }
 }

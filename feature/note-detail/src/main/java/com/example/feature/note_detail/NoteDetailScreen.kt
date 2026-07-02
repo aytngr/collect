@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -76,6 +78,7 @@ import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTextStyle.DetailHeadline
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.core.ui.HorizontalSpacer
 import com.example.core.ui.R
@@ -171,7 +174,9 @@ fun NoteDetailContent(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = AppTheme.colors.bg)
-                .padding(16.dp),
+                .systemBarsPadding()
+                .imePadding()
+                .padding(Spacing.screen),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -209,7 +214,7 @@ fun NoteDetailContent(
                 }
             }
 
-            VerticalSpacer(12.dp)
+            VerticalSpacer(Spacing.md)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -221,7 +226,7 @@ fun NoteDetailContent(
                     color = AppTheme.colors.faint
                 )
 
-                HorizontalSpacer(8.dp)
+                HorizontalSpacer(Spacing.sm)
 
                 Text(
                     text = "·",
@@ -229,7 +234,7 @@ fun NoteDetailContent(
                     color = AppTheme.colors.faint
                 )
 
-                HorizontalSpacer(8.dp)
+                HorizontalSpacer(Spacing.sm)
 
                 Text(
                     text = state.createdTime,
@@ -238,7 +243,7 @@ fun NoteDetailContent(
                 )
             }
 
-            VerticalSpacer(12.dp)
+            VerticalSpacer(Spacing.md)
 
             BasicTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -275,7 +280,7 @@ fun NoteDetailContent(
                 )
             }
 
-            VerticalSpacer(16.dp)
+            VerticalSpacer(Spacing.lg)
 
             BasicTextField(
                 textStyle = AppTextStyle.NoteBody,
@@ -302,13 +307,12 @@ fun NoteDetailContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            VerticalSpacer(16.dp)
+            VerticalSpacer(Spacing.lg)
 
             state.note.images?.let { images ->
-                VerticalSpacer(16.dp)
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     itemsIndexed(items = images) { index, image ->
@@ -341,7 +345,7 @@ fun NoteDetailContent(
 
             WeightSpacer()
 
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.sm)
 
             Text(
                 text = state.editedTime,
@@ -349,7 +353,7 @@ fun NoteDetailContent(
                 color = AppTheme.colors.faint
             )
 
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.sm)
 
             if (showImagePreview != -1 && state.note?.images != null) {
                 Box(
@@ -357,7 +361,7 @@ fun NoteDetailContent(
                         .background(Color.Black.copy(alpha = 0.7f))
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(bottom = 32.dp)
+                        .padding(bottom = Spacing.xxl)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
@@ -367,7 +371,7 @@ fun NoteDetailContent(
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(Spacing.lg)
                         )
                         TextButton(
                             onClick = { showImagePreview = -1 },

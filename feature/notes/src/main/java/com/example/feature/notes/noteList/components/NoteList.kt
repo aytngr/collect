@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.core.common.base.formatTimeAgo
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.ui.GridNoteItem
 import com.example.core.ui.NoteItem
 import com.example.domain.models.Note
@@ -29,7 +29,7 @@ fun NotesView(
     when (viewMode) {
         ViewMode.LIST -> LazyColumn(
             modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             items(items = notes, key = { it.id }) { note ->
                 NoteItem(
@@ -51,8 +51,8 @@ fun NotesView(
         ViewMode.GRID -> LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
             gridItems(items = notes, key = { it.id }) { note ->
                 GridNoteItem(

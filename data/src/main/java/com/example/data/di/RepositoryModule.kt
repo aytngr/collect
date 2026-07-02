@@ -3,10 +3,8 @@ package com.example.data.di
 import com.example.data.reminder.AlarmReminderScheduler
 import com.example.data.repository.DataStoreRepositoryImpl
 import com.example.data.repository.NotesRepositoryImpl
-import com.example.data.repository.VoiceRecognitionRepositoryImpl
 import com.example.domain.repository.NotesRepository
 import com.example.domain.repository.PreferenceRepository
-import com.example.domain.repository.VoiceRecognitionRepository
 import com.example.domain.scheduler.ReminderScheduler
 import dagger.Binds
 import dagger.Module
@@ -29,12 +27,6 @@ abstract class RepositoryModule {
     abstract fun bindPreferenceRepository(
         preferenceRepository: DataStoreRepositoryImpl
     ): PreferenceRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindVoiceRecognitionRepository(
-        voiceRecognitionRepositoryImpl: VoiceRecognitionRepositoryImpl
-    ): VoiceRecognitionRepository
 
     @Binds
     @Singleton

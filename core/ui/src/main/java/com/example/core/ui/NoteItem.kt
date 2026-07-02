@@ -37,6 +37,7 @@ import coil3.compose.AsyncImage
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
@@ -71,13 +72,13 @@ fun NoteItem(
                 painter = painterResource(if (isSelected) R.drawable.selected else R.drawable.unselected),
                 contentDescription = "",
                 tint = AppTheme.colors.accent,
-                modifier = Modifier.padding(top = 12.dp, start = 12.dp)
+                modifier = Modifier.padding(top = Spacing.md, start = Spacing.md)
             )
         }
 
         Column(
             modifier = Modifier
-                .padding(start = 12.dp, end = 16.dp, top = 14.dp, bottom = 14.dp)
+                .padding(start = Spacing.md, top = Spacing.md, end = Spacing.lg, bottom = Spacing.md)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isPinned) {
@@ -86,7 +87,7 @@ fun NoteItem(
                         contentDescription = stringResource(R.string.note_item_pinned_cd),
                         Modifier.size(18.dp)
                     )
-                    HorizontalSpacer(8.dp)
+                    HorizontalSpacer(Spacing.sm)
                 }
                 Text(text = title.takeIf { it.isNotEmpty() } ?: stringResource(R.string.note_item_untitled),
                     style = AppTextStyle.NoteTitle,
@@ -104,11 +105,11 @@ fun NoteItem(
                 maxLines = 1,
             )
 
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.sm)
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = category, style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
-                HorizontalSpacer(16.dp)
+                HorizontalSpacer(Spacing.lg)
                 when {
                     reminder != null -> {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -118,7 +119,7 @@ fun NoteItem(
                                 tint = AppTheme.colors.accent,
                                 modifier = Modifier.size(12.dp)
                             )
-                            HorizontalSpacer(4.dp)
+                            HorizontalSpacer(Spacing.xs)
                             Text(
                                 text = reminder,
                                 color = AppTheme.colors.accent,
@@ -137,7 +138,7 @@ fun NoteItem(
                     }
                 }
             }
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.sm)
             HorizontalDivider(color = AppTheme.colors.line)
         }
     }
@@ -168,7 +169,7 @@ fun GridNoteItem(
             )
             .background(color = AppTheme.colors.surface)
             .noRippleCombinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .padding(horizontal = Spacing.lg, vertical = Spacing.md)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = category, style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
@@ -185,15 +186,15 @@ fun GridNoteItem(
                     painter = painterResource(if (isSelected) R.drawable.selected else R.drawable.unselected),
                     contentDescription = "",
                     tint = AppTheme.colors.accent,
-                    modifier = Modifier.padding(top = 12.dp, start = 12.dp)
+                    modifier = Modifier.padding(top = Spacing.md, start = Spacing.md)
                 )
             }
         }
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.sm)
         Text(text = title.takeIf { it.isNotEmpty() } ?: "Untitled",
             style = AppTextStyle.NoteTitle,
             maxLines = 1)
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.sm)
         image?.let {
             AsyncImage(
                 model = File(image),
@@ -211,7 +212,7 @@ fun GridNoteItem(
                 },
             )
         }
-        VerticalSpacer(8.dp)
+        VerticalSpacer(Spacing.sm)
         if (content.isNotEmpty()) {
             Text(
                 text = content,
@@ -219,7 +220,7 @@ fun GridNoteItem(
                 color = AppTheme.colors.sub,
                 maxLines = 4
             )
-            VerticalSpacer(8.dp)
+            VerticalSpacer(Spacing.sm)
         }
 
         Row {

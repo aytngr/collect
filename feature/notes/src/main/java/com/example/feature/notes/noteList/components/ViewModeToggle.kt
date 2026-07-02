@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.ui.R
 import com.example.feature.notes.noteList.enums.ViewMode
 
@@ -66,7 +67,7 @@ private fun ToggleCell(
         color = bg,
         shadowElevation = if (selected) 2.dp else 0.dp,
     ) {
-        Box(Modifier.padding(12.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.padding(Spacing.md), contentAlignment = Alignment.Center) {
             Icon(
                 painter = painterResource(icon),
                 contentDescription = null,

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -54,6 +55,7 @@ import com.example.core.common.base.formatDate
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
+import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.core.ui.NoteItem
 import com.example.core.ui.R
@@ -124,7 +126,8 @@ private fun HomeContent(
         modifier = Modifier
             .background(color = AppTheme.colors.bg)
             .fillMaxSize()
-            .padding(16.dp)
+            .systemBarsPadding()
+            .padding(Spacing.screen)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -139,7 +142,7 @@ private fun HomeContent(
                 Text(
                     text = state.greeting,
                     style = AppTextStyle.GreetingTitle,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = Spacing.sm)
                 )
             }
             Row(
@@ -178,7 +181,7 @@ private fun HomeContent(
                 Text(
                     text = stringResource(HomeR.string.home_up_next),
                     style = AppTextStyle.Eyebrow,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = Spacing.sm)
                 )
             }
 
@@ -189,10 +192,10 @@ private fun HomeContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Spacing.lg))
 
         if (state.upNextReminders.isNotEmpty()) {
-            LazyColumn {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 itemsIndexed(items = state.upNextReminders) { index, reminder ->
                     ReminderBox(
                         isNext = (index == 0),
@@ -203,14 +206,17 @@ private fun HomeContent(
             }
         }
 
-        VerticalSpacer(16.dp)
+        VerticalSpacer(Spacing.lg)
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             Text(
                 text = stringResource(HomeR.string.home_jump_back_in),
                 style = AppTextStyle.Eyebrow,
-                modifier = Modifier.padding(start = 8.dp)
             )
 
             Text(
@@ -226,8 +232,8 @@ private fun HomeContent(
         // todo list of recent notes
         state.recentNotes.let {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                contentPadding = PaddingValues(top = Spacing.sm, bottom = Spacing.sm),
                 modifier = Modifier.weight(1f),
 
                 ) {
@@ -247,6 +253,8 @@ private fun HomeContent(
             }
         }
 
+        VerticalSpacer(Spacing.md)
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -255,7 +263,7 @@ private fun HomeContent(
                 .border(width = 1.dp, color = AppTheme.colors.line, shape = AppShapes.large)
                 .clip(AppShapes.large)
                 .background(color = Color.White)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = Spacing.lg, vertical = Spacing.sm)
         ) {
             Text(
                 text = stringResource(HomeR.string.home_capture_placeholder),
@@ -277,11 +285,9 @@ private fun HomeContent(
 
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
         if (state.isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(Spacing.lg)
             )
         }
 
