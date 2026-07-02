@@ -1,0 +1,19 @@
+<resources>
+    <string name="notedetail_toast_enable_notifications">Hatırlatma alabilmek için bildirimlere izin ver</string>
+    <string name="notedetail_back_cd">Geri</string>
+    <string name="notedetail_pin_cd">Notu sabitle</string>
+    <string name="notedetail_reminder_cd">Hatırlatıcı ayarla</string>
+    <string name="notedetail_more_cd">Diğer seçenekler</string>
+    <string name="notedetail_untitled">Başlıksız</string>
+    <string name="notedetail_reminder_label">HATIRLATICI</string>
+    <string name="notedetail_content_placeholder">Notunu yaz...</string>
+    <string name="notedetail_screenshot_cd">Ekran görüntüsü</string>
+    <string name="notedetail_full_screenshot_cd">Tam ekran görüntüsü</string>
+    <string name="notedetail_close">Kapat</string>
+    <string name="notedetail_exact_alarm_title">Tam zamanlı alarm izni ver</string>
+    <string name="notedetail_exact_alarm_body">Bildirimleri zamanında alabilmek için izin ver.</string>
+    <string name="notedetail_open_settings">Ayarları aç</string>
+    <string name="notedetail_cancel">İptal</string>
+    <string name="notedetail_add_image_cd">Görsel ekle</string>
+    <string name="notedetail_add_label">Ekle</string>
+</resources>

@@ -39,7 +39,6 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.example.core.designsystem.theme.TaskFlowTheme
-import com.example.domain.models.Language
 import com.example.domain.models.NoteCategory
 import com.example.domain.models.SaveStatus
 import com.example.domain.models.onError
@@ -206,10 +205,10 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Overlay Service",
+                getString(R.string.overlay_notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "Note overlay button service"
+                description = getString(R.string.overlay_notification_channel_desc)
             }
 
             val notificationManager = getSystemService(NotificationManager::class.java)
@@ -219,8 +218,8 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Quick Note")
-            .setContentText("Overlay button is active")
+            .setContentTitle(getString(R.string.overlay_notification_title))
+            .setContentText(getString(R.string.overlay_notification_text))
             .setSmallIcon(R.drawable.ic_notification)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
@@ -381,8 +380,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             title = null,
             content = noteText,
             images = images,
-            reminderAt = reminderAt,
-            language = Language.AZERBAIJANI
+            reminderAt = reminderAt
         )
             .onSuccess {
                 onSaveStatus(SaveStatus.SUCCESS)

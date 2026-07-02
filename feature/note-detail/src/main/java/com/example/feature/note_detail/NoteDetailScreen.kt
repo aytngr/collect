@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,12 +84,12 @@ import com.example.core.ui.ReminderSheet
 import com.example.core.ui.VerticalSpacer
 import com.example.core.ui.WeightSpacer
 import com.example.core.ui.noRippleClickable
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import com.example.feature.note_detail.ops.copyToInternalStorage
 import kotlinx.coroutines.launch
 import java.io.File
+import com.example.feature.note_detail.R as NoteDetailR
 
 @Composable
 fun NoteDetailScreen(
@@ -141,7 +142,7 @@ fun NoteDetailContent(
         if (!granted)
             Toast.makeText(
                 context,
-                "Enable notifications to get reminders",
+                context.getString(NoteDetailR.string.notedetail_toast_enable_notifications),
                 Toast.LENGTH_SHORT
             ).show()
     }
@@ -177,7 +178,7 @@ fun NoteDetailContent(
                 IconButton(onClick = { /* action */ }) {
                     Icon(
                         painter = painterResource(R.drawable.chevron),
-                        contentDescription = "Back"
+                        contentDescription = stringResource(NoteDetailR.string.notedetail_back_cd)
                     )
                 }
                 Spacer(Modifier.weight(1f))
@@ -186,7 +187,7 @@ fun NoteDetailContent(
                         painter = if (state.note.isPinned) painterResource(R.drawable.pin) else painterResource(
                             R.drawable.pin
                         ),
-                        contentDescription = "Back"
+                        contentDescription = stringResource(NoteDetailR.string.notedetail_pin_cd)
                     )
                 }
                 IconButton(onClick = {
@@ -197,13 +198,13 @@ fun NoteDetailContent(
                 }) {
                     Icon(
                         painter = painterResource(R.drawable.bell),
-                        contentDescription = "Back"
+                        contentDescription = stringResource(NoteDetailR.string.notedetail_reminder_cd)
                     )
                 }
                 IconButton(onClick = { /* action */ }) {
                     Icon(
                         painter = painterResource(R.drawable.more),
-                        contentDescription = "Back"
+                        contentDescription = stringResource(NoteDetailR.string.notedetail_more_cd)
                     )
                 }
             }
@@ -254,7 +255,7 @@ fun NoteDetailContent(
                     Box {
                         if (state.note.title.isEmpty()) {
                             Text(
-                                text = "Untitled",
+                                text = stringResource(NoteDetailR.string.notedetail_untitled),
                                 style = DetailHeadline,
                                 color = AppTheme.colors.faint
                             )
@@ -267,7 +268,7 @@ fun NoteDetailContent(
             state.note.reminderAt?.let {
                 ReminderBox(
                     isNext = it > System.currentTimeMillis(),
-                    title = "REMINDER",
+                    title = stringResource(NoteDetailR.string.notedetail_reminder_label),
                     date = state.reminder,
                     isDetail = true,
                     onEditClick = { showReminderSheet = true }
@@ -290,7 +291,7 @@ fun NoteDetailContent(
                     Box() {
                         if (state.note.content.isEmpty()) {
                             Text(
-                                text = "Enter your note...",
+                                text = stringResource(NoteDetailR.string.notedetail_content_placeholder),
                                 style = AppTextStyle.NoteBody,
                                 color = AppTheme.colors.faint
                             )
@@ -313,7 +314,7 @@ fun NoteDetailContent(
                     itemsIndexed(items = images) { index, image ->
                         AsyncImage(
                             model = image?.let(::File),
-                            contentDescription = "Screenshot",
+                            contentDescription = stringResource(NoteDetailR.string.notedetail_screenshot_cd),
                             modifier = Modifier
                                 .size(100.dp)
                                 .clip(AppShapes.small)
@@ -362,7 +363,7 @@ fun NoteDetailContent(
                         Image(
                             bitmap = BitmapFactory.decodeFile(state.note?.images!![showImagePreview])
                                 .asImageBitmap(),
-                            contentDescription = "Full Screenshot",
+                            contentDescription = stringResource(NoteDetailR.string.notedetail_full_screenshot_cd),
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -371,7 +372,7 @@ fun NoteDetailContent(
                         TextButton(
                             onClick = { showImagePreview = -1 },
                         ) {
-                            Text("Close", color = Color.White, fontSize = 18.sp)
+                            Text(stringResource(NoteDetailR.string.notedetail_close), color = Color.White, fontSize = 18.sp)
                         }
                     }
                 }
@@ -397,8 +398,8 @@ fun NoteDetailContent(
         if (state.showExactAlarmPermissionDialog) {
             AlertDialog(
                 onDismissRequest = { onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility) },
-                title = { Text("Give exact alarm permission") },
-                text = { Text("Give permission to receive notifications on time.") },
+                title = { Text(stringResource(NoteDetailR.string.notedetail_exact_alarm_title)) },
+                text = { Text(stringResource(NoteDetailR.string.notedetail_exact_alarm_body)) },
                 confirmButton = {
                     TextButton(onClick = {
                         val intent = Intent(
@@ -409,7 +410,7 @@ fun NoteDetailContent(
                         onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility)
                         onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
                     }) {
-                        Text("Open settings")
+                        Text(stringResource(NoteDetailR.string.notedetail_open_settings))
                     }
                 },
                 dismissButton = {
@@ -417,7 +418,7 @@ fun NoteDetailContent(
                         onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility)
                         onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
                     }) {
-                        Text("Cancel")
+                        Text(stringResource(NoteDetailR.string.notedetail_cancel))
                     }
                 },
             )
@@ -441,9 +442,9 @@ private fun AddImage(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Outlined.Add,
                 tint = AppTheme.colors.accent,
-                contentDescription = "Add Image"
+                contentDescription = stringResource(NoteDetailR.string.notedetail_add_image_cd)
             )
-            Text("Add", color = AppTheme.colors.accent, style = AppTextStyle.Metadata)
+            Text(stringResource(NoteDetailR.string.notedetail_add_label), color = AppTheme.colors.accent, style = AppTextStyle.Metadata)
         }
     }
 }
@@ -460,7 +461,6 @@ private fun NoteDetailContentPreview() {
                     title = "Team Standup Notes",
                     content = "Discussed sprint progress.\nBlocking issue: auth service timeout.\nNext steps: investigate logs and schedule a sync with backend team.",
                     category = NoteCategory.WORK,
-                    language = Language.ENGLISH,
                     createdAt = System.currentTimeMillis(),
                     extractedData = emptyMap(),
                     images = listOf("lalalalla")

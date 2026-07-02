@@ -1,0 +1,29 @@
+<resources>
+    <string name="reminder_title">Remind me</string>
+    <string name="reminder_clear">Clear</string>
+    <string name="reminder_when_label">WHEN</string>
+    <string name="reminder_day_today">Today</string>
+    <string name="reminder_day_tomorrow">Tomorrow</string>
+    <string name="reminder_day_weekend">Weekend</string>
+    <string name="reminder_day_next_week">Next week</string>
+    <string name="reminder_pick_date">Pick date…</string>
+    <string name="reminder_time_label">TIME</string>
+    <string name="reminder_time_morning">Morning</string>
+    <string name="reminder_time_noon">Noon</string>
+    <string name="reminder_time_evening">Evening</string>
+    <string name="reminder_time_night">Night</string>
+    <string name="reminder_pick_time">Pick time…</string>
+    <string name="reminder_remove">Remove</string>
+    <string name="reminder_cancel">Cancel</string>
+    <string name="reminder_set">Set</string>
+    <string name="reminder_box_edit">Edit</string>
+    <string name="date_picker_previous_month_cd">Previous month</string>
+    <string name="date_picker_next_month_cd">Next month</string>
+    <string name="note_item_pinned_cd">Pinned</string>
+    <string name="note_item_untitled">Untitled</string>
+    <string name="note_item_screenshot_cd">Screenshot</string>
+    <string name="inline_picker_cancel">Cancel</string>
+    <string name="inline_picker_ok">OK</string>
+    <string name="reminder_sheet_ok">OK</string>
+    <string name="reminder_sheet_cancel">Cancel</string>
+</resources>

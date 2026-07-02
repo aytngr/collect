@@ -1,0 +1,18 @@
+<resources>
+    <string name="data_error_recognition_unavailable">Bu cihazda konuşma tanıma kullanılamıyor</string>
+    <string name="data_error_audio">Ses kayıt hatası</string>
+    <string name="data_error_client">İstemci hatası</string>
+    <string name="data_error_insufficient_permissions">Yetersiz izinler</string>
+    <string name="data_error_network">Ağ hatası</string>
+    <string name="data_error_network_timeout">Ağ zaman aşımı</string>
+    <string name="data_error_no_match">Eşleşen konuşma bulunamadı</string>
+    <string name="data_error_recognizer_busy">Konuşma tanıyıcı meşgul</string>
+    <string name="data_error_server">Sunucu hatası</string>
+    <string name="data_error_speech_timeout">Konuşma girişi yok</string>
+    <string name="data_error_unknown">Bilinmeyen hata</string>
+    <string name="data_error_no_speech_recognized">Konuşma algılanamadı</string>
+    <string name="data_error_start_failed">Sesli tanıma başlatılamadı</string>
+    <string name="data_reminder_notification_title">Hatırlatıcı</string>
+    <string name="data_reminder_channel_name">Hatırlatıcılar</string>
+    <string name="data_reminder_channel_desc">Not hatırlatıcıları</string>
+</resources>

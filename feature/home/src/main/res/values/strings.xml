@@ -1,0 +1,17 @@
+<resources>
+    <string name="home_search_cd">Search</string>
+    <string name="home_up_next">UP NEXT</string>
+    <plurals name="home_reminders_count">
+        <item quantity="one">%1$d reminder</item>
+        <item quantity="other">%1$d reminders</item>
+    </plurals>
+    <string name="home_jump_back_in">JUMP BACK IN</string>
+    <string name="home_all_notes">All notes</string>
+    <string name="home_capture_placeholder">Capture a thought...</string>
+    <string name="home_quick_capture_off_title">Quick capture is off</string>
+    <string name="home_quick_capture_off_body">Start the floating button to capture notes from anywhere.</string>
+    <string name="home_not_now">Not now</string>
+    <string name="home_start_floating_widget">Start Floating Widget</string>
+    <string name="home_recent_notes_title">Recent Notes</string>
+    <string name="home_view_all">View All</string>
+</resources>

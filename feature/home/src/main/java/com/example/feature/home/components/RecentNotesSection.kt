@@ -10,12 +10,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.domain.models.Note
-import com.example.domain.models.NoteCategory
-import java.text.SimpleDateFormat
-import java.util.*
+import com.example.feature.home.R
 
 @Composable
 fun RecentNotesSection(
@@ -30,14 +29,14 @@ fun RecentNotesSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Recent Notes",
+                text = stringResource(R.string.home_recent_notes_title),
                 style = MaterialTheme.typography.headlineSmall
             )
 
             TextButton(
                 onClick = onViewAllClick
             ) {
-                Text("View All")
+                Text(stringResource(R.string.home_view_all))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
@@ -49,91 +48,5 @@ fun RecentNotesSection(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
-
     }
-}
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//private fun NoteCard(
-//    note: Note,
-//    modifier: Modifier = Modifier
-//) {
-//    Card(
-//        modifier = modifier.fillMaxWidth(),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp)
-//        ) {
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.Top
-//            ) {
-//                Text(
-//                    text = note.content,
-//                    style = MaterialTheme.typography.bodyMedium,
-//                    maxLines = 2,
-//                    overflow = TextOverflow.Ellipsis,
-//                    modifier = Modifier.weight(1f)
-//                )
-//
-//                // Category chip
-//                CategoryChip(category = note.category)
-//            }
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-//
-//            // Date and language
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Text(
-//                    text = formatDate(note.createdAt),
-//                    style = MaterialTheme.typography.bodySmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//
-//                Text(
-//                    text = note.language.displayName,
-//                    style = MaterialTheme.typography.bodySmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//            }
-//        }
-//    }
-//}
-
-@Composable
-//private fun CategoryChip(category: NoteCategory) {
-//    val (text, color) = when (category) {
-//        NoteCategory.SHOPPING -> "Shopping" to MaterialTheme.colorScheme.primary
-//        NoteCategory.REMINDER -> "Reminder" to MaterialTheme.colorScheme.secondary
-//        NoteCategory.WORK -> "Work" to MaterialTheme.colorScheme.tertiary
-//        NoteCategory.GENERAL -> "General" to MaterialTheme.colorScheme.outline
-//    }
-//
-//    AssistChip(
-//        onClick = { },
-//        label = {
-//            Text(
-//                text = text,
-//                style = MaterialTheme.typography.labelSmall
-//            )
-//        },
-//        colors = AssistChipDefaults.assistChipColors(
-//            containerColor = color.copy(alpha = 0.1f),
-//            labelColor = color
-//        )
-//    )
-//}
-
-private fun formatDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("MMM dd, HH:mm", Locale.getDefault())
-    return formatter.format(Date(timestamp))
 }

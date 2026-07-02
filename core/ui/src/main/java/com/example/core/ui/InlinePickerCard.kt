@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTheme
@@ -45,8 +46,8 @@ fun InlinePickerCard(
             ) {
                 content()
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = onCancel) { Text("Cancel") }
-                    TextButton(onClick = onSelect) { Text("OK") }
+                    TextButton(onClick = onCancel) { Text(stringResource(R.string.inline_picker_cancel)) }
+                    TextButton(onClick = onSelect) { Text(stringResource(R.string.inline_picker_ok)) }
                 }
             }
         }

@@ -1,0 +1,18 @@
+<resources>
+    <string name="notes_cancel">Cancel</string>
+    <string name="notes_selected_count">%1$d selected</string>
+    <string name="notes_select_all">Select all</string>
+    <string name="notes_all_notes_title">All notes</string>
+    <string name="notes_empty_no_notes">No notes yet. Create your first note!</string>
+    <string name="notes_empty_no_search_results">No notes match your search.</string>
+    <string name="notes_action_pin">Pin</string>
+    <string name="notes_action_move">Move</string>
+    <string name="notes_action_combine">Combine</string>
+    <string name="notes_action_delete">Delete</string>
+    <string name="notes_move_to_title">Move to</string>
+    <string name="notes_search_placeholder">Search notes...</string>
+    <string name="notes_clear_search_cd">Clear Search</string>
+    <string name="notes_category_all">All</string>
+    <string name="notes_toast_notes_deleted">Notes deleted</string>
+    <string name="notes_toast_note_deleted">Note deleted</string>
+</resources>

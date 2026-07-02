@@ -3,7 +3,6 @@ package com.example.feature.home
 import com.example.core.common.base.BaseEffect
 import com.example.core.common.base.BaseIntent
 import com.example.core.common.base.BaseState
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 
 class HomeContract {
@@ -15,7 +14,6 @@ class HomeContract {
 
     data class State(
         val upNextReminders: List<Note> = emptyList(),
-        val selectedLanguage: Language = Language.TURKISH,
         val transcribedText: String = "",
         val recentNotes: List<Note> = emptyList(),
         val timeAgo: List<String> = emptyList(),

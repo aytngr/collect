@@ -1,0 +1,19 @@
+<resources>
+    <string name="notedetail_toast_enable_notifications">Enable notifications to get reminders</string>
+    <string name="notedetail_back_cd">Back</string>
+    <string name="notedetail_pin_cd">Pin note</string>
+    <string name="notedetail_reminder_cd">Set reminder</string>
+    <string name="notedetail_more_cd">More options</string>
+    <string name="notedetail_untitled">Untitled</string>
+    <string name="notedetail_reminder_label">REMINDER</string>
+    <string name="notedetail_content_placeholder">Enter your note...</string>
+    <string name="notedetail_screenshot_cd">Screenshot</string>
+    <string name="notedetail_full_screenshot_cd">Full Screenshot</string>
+    <string name="notedetail_close">Close</string>
+    <string name="notedetail_exact_alarm_title">Give exact alarm permission</string>
+    <string name="notedetail_exact_alarm_body">Give permission to receive notifications on time.</string>
+    <string name="notedetail_open_settings">Open settings</string>
+    <string name="notedetail_cancel">Cancel</string>
+    <string name="notedetail_add_image_cd">Add Image</string>
+    <string name="notedetail_add_label">Add</string>
+</resources>

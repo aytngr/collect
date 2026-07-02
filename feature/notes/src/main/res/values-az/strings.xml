@@ -1,0 +1,18 @@
+<resources>
+    <string name="notes_cancel">Ləğv et</string>
+    <string name="notes_selected_count">%1$d seçilib</string>
+    <string name="notes_select_all">Hamısını seç</string>
+    <string name="notes_all_notes_title">Bütün qeydlər</string>
+    <string name="notes_empty_no_notes">Hələ qeyd yoxdur. İlk qeydini yarat!</string>
+    <string name="notes_empty_no_search_results">Axtarışına uyğun qeyd tapılmadı.</string>
+    <string name="notes_action_pin">Bərkit</string>
+    <string name="notes_action_move">Köçür</string>
+    <string name="notes_action_combine">Birləşdir</string>
+    <string name="notes_action_delete">Sil</string>
+    <string name="notes_move_to_title">Köçür</string>
+    <string name="notes_search_placeholder">Qeydlərdə axtar...</string>
+    <string name="notes_clear_search_cd">Axtarışı təmizlə</string>
+    <string name="notes_category_all">Hamısı</string>
+    <string name="notes_toast_notes_deleted">Qeydlər silindi</string>
+    <string name="notes_toast_note_deleted">Qeyd silindi</string>
+</resources>

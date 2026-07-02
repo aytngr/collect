@@ -1,0 +1,18 @@
+<resources>
+    <string name="notes_cancel">Отмена</string>
+    <string name="notes_selected_count">Выбрано: %1$d</string>
+    <string name="notes_select_all">Выбрать все</string>
+    <string name="notes_all_notes_title">Все заметки</string>
+    <string name="notes_empty_no_notes">Пока нет заметок. Создайте первую!</string>
+    <string name="notes_empty_no_search_results">Ничего не найдено по вашему запросу.</string>
+    <string name="notes_action_pin">Закрепить</string>
+    <string name="notes_action_move">Переместить</string>
+    <string name="notes_action_combine">Объединить</string>
+    <string name="notes_action_delete">Удалить</string>
+    <string name="notes_move_to_title">Переместить в</string>
+    <string name="notes_search_placeholder">Поиск заметок...</string>
+    <string name="notes_clear_search_cd">Очистить поиск</string>
+    <string name="notes_category_all">Все</string>
+    <string name="notes_toast_notes_deleted">Заметки удалены</string>
+    <string name="notes_toast_note_deleted">Заметка удалена</string>
+</resources>

@@ -1,0 +1,22 @@
+<resources>
+    <string name="overlay_notification_channel_name">Overlay Xidməti</string>
+    <string name="overlay_notification_channel_desc">Qeyd overlay düyməsi xidməti</string>
+    <string name="overlay_notification_title">Sürətli Qeyd</string>
+    <string name="overlay_notification_text">Overlay düyməsi aktivdir</string>
+    <string name="overlay_saved">Yadda saxlanıldı!</string>
+    <string name="overlay_error">Xəta!</string>
+    <string name="overlay_collect_label">Topla</string>
+    <string name="overlay_quick_capture_label">sürətli qeyd</string>
+    <string name="overlay_hide_cd">Gizlət</string>
+    <string name="overlay_minimize_cd">Kiçilt</string>
+    <string name="overlay_close_cd">Bağla</string>
+    <string name="overlay_add_screenshot_cd">Ekran şəkli əlavə et</string>
+    <string name="overlay_reminder_cd">Xatırlatma</string>
+    <string name="overlay_category_cd">Kateqoriya</string>
+    <string name="overlay_save_cd">Yadda saxla</string>
+    <string name="overlay_screenshot_thumbnail_cd">Ekran şəkli</string>
+    <string name="overlay_remove_screenshot_cd">Ekran şəklini sil</string>
+    <string name="overlay_text_placeholder">Buraya...</string>
+    <string name="overlay_full_screenshot_cd">Tam ekran şəkli</string>
+    <string name="overlay_close_button">Bağla</string>
+</resources>

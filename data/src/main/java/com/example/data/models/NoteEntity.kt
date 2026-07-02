@@ -13,7 +13,6 @@ data class NoteEntity(
 
     val category: String,
     val isCategoryManual: Boolean = false,
-    val language: String,
     val extractedData: String,
 
     val ocrText: String = "",

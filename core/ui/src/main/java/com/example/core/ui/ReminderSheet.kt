@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
@@ -158,9 +159,9 @@ fun ReminderSheet(
                 TextButton(onClick = {
                     state.selectedDateMillis?.let { day = it.toLocalDateUtc() }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.reminder_sheet_ok)) }
             },
-            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.reminder_sheet_cancel)) } },
         ) {
             DatePicker(state = state)
         }
@@ -178,9 +179,9 @@ fun ReminderSheet(
                 TextButton(onClick = {
                     time = LocalTime.of(state.hour, state.minute)
                     showTimePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.reminder_sheet_ok)) }
             },
-            dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.reminder_sheet_cancel)) } },
             text = { TimePicker(state = state) },
         )
     }

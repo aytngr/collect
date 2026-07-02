@@ -1,7 +1,6 @@
 package com.example.domain.usecase
 
 import com.example.domain.models.DataResult
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.onError
 import com.example.domain.models.onSuccess

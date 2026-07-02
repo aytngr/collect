@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
@@ -28,6 +29,7 @@ import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.Faint
 import com.example.core.ui.HorizontalSpacer
 import com.example.core.ui.noRippleClickable
+import com.example.feature.notes.R
 
 @Composable
 fun SearchBar(
@@ -68,7 +70,7 @@ fun SearchBar(
                 HorizontalSpacer(8.dp)
                 Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                     if (query.isEmpty()) {
-                        Text("Search notes...", style = AppTextStyle.Chip, color = Faint)
+                        Text(stringResource(R.string.notes_search_placeholder), style = AppTextStyle.Chip, color = Faint)
                     }
                     innerTextField()
                 }
@@ -76,7 +78,7 @@ fun SearchBar(
                     HorizontalSpacer(8.dp)
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear Search",
+                        contentDescription = stringResource(R.string.notes_clear_search_cd),
                         tint = AppTheme.colors.sub,
                         modifier = Modifier
                             .size(20.dp)

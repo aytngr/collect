@@ -41,6 +41,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -59,6 +61,7 @@ import com.example.core.ui.ReminderBox
 import com.example.core.ui.VerticalSpacer
 import com.example.core.ui.noRippleClickable
 import com.example.domain.models.Note
+import com.example.feature.home.R as HomeR
 
 @Composable
 fun HomeScreen(
@@ -145,7 +148,7 @@ private fun HomeContent(
                 IconButton(onClick = { /* TODO: navigate to search */ }) {
                     Icon(
                         imageVector = Icons.Outlined.Search,
-                        contentDescription = "Search",
+                        contentDescription = stringResource(HomeR.string.home_search_cd),
                         tint = AppTheme.colors.ink
                     )
                 }
@@ -173,14 +176,14 @@ private fun HomeContent(
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = "UP NEXT",
+                    text = stringResource(HomeR.string.home_up_next),
                     style = AppTextStyle.Eyebrow,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
 
             Text(
-                text = "${state.reminderCount} reminders",
+                text = pluralStringResource(HomeR.plurals.home_reminders_count, state.reminderCount, state.reminderCount),
                 style = AppTextStyle.Metadata,
                 color = AppTheme.colors.faint
             )
@@ -205,13 +208,13 @@ private fun HomeContent(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
             Text(
-                text = "JUMP BACK IN",
+                text = stringResource(HomeR.string.home_jump_back_in),
                 style = AppTextStyle.Eyebrow,
                 modifier = Modifier.padding(start = 8.dp)
             )
 
             Text(
-                text = "All notes",
+                text = stringResource(HomeR.string.home_all_notes),
                 style = AppTextStyle.Button,
                 color = AppTheme.colors.accent,
                 modifier = Modifier.noRippleClickable() {
@@ -255,7 +258,7 @@ private fun HomeContent(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
-                text = "Capture a thought...",
+                text = stringResource(HomeR.string.home_capture_placeholder),
                 style = AppTextStyle.NoteTitle,
                 color = AppTheme.colors.faint,
                 modifier = Modifier.weight(1f)
@@ -285,12 +288,12 @@ private fun HomeContent(
         if(state.showOverlayDialog){
             AlertDialog(
                 onDismissRequest = { onIntent(HomeContract.Intent.RefreshOverlayStatus) },
-                title = { Text("Quick capture is off") },
-                text = { Text("Start the floating button to capture notes from anywhere.") },
+                title = { Text(stringResource(HomeR.string.home_quick_capture_off_title)) },
+                text = { Text(stringResource(HomeR.string.home_quick_capture_off_body)) },
                 confirmButton = {
                     StartFloatingServiceButton({ onIntent(HomeContract.Intent.StartOverlay) })
                 },
-                dismissButton = { TextButton(onClick = { onIntent(HomeContract.Intent.RefreshOverlayStatus) }) { Text("Not now") } },
+                dismissButton = { TextButton(onClick = { onIntent(HomeContract.Intent.RefreshOverlayStatus) }) { Text(stringResource(HomeR.string.home_not_now)) } },
             )
         }
 
@@ -312,7 +315,7 @@ fun StartFloatingServiceButton(startOverlay: () -> Unit) {
             context.startActivity(intent)
         }
     }) {
-        Text("Start Floating Widget")
+        Text(stringResource(HomeR.string.home_start_floating_widget))
     }
 }
 

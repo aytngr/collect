@@ -1,0 +1,22 @@
+<resources>
+    <string name="overlay_notification_channel_name">Overlay Service</string>
+    <string name="overlay_notification_channel_desc">Note overlay button service</string>
+    <string name="overlay_notification_title">Quick Note</string>
+    <string name="overlay_notification_text">Overlay button is active</string>
+    <string name="overlay_saved">Saved!</string>
+    <string name="overlay_error">Error!</string>
+    <string name="overlay_collect_label">Collect</string>
+    <string name="overlay_quick_capture_label">quick capture</string>
+    <string name="overlay_hide_cd">Hide</string>
+    <string name="overlay_minimize_cd">Minimize</string>
+    <string name="overlay_close_cd">Close</string>
+    <string name="overlay_add_screenshot_cd">Add screenshot</string>
+    <string name="overlay_reminder_cd">Reminder</string>
+    <string name="overlay_category_cd">Category</string>
+    <string name="overlay_save_cd">Save</string>
+    <string name="overlay_screenshot_thumbnail_cd">Screenshot</string>
+    <string name="overlay_remove_screenshot_cd">Remove screenshot</string>
+    <string name="overlay_text_placeholder">Here...</string>
+    <string name="overlay_full_screenshot_cd">Full Screenshot</string>
+    <string name="overlay_close_button">Close</string>
+</resources>

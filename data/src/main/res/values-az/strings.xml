@@ -1,0 +1,18 @@
+<resources>
+    <string name="data_error_recognition_unavailable">Bu cihazda nitq tanıma mövcud deyil</string>
+    <string name="data_error_audio">Səs yazma xətası</string>
+    <string name="data_error_client">Müştəri xətası</string>
+    <string name="data_error_insufficient_permissions">Kifayət qədər icazə yoxdur</string>
+    <string name="data_error_network">Şəbəkə xətası</string>
+    <string name="data_error_network_timeout">Şəbəkə vaxtı bitdi</string>
+    <string name="data_error_no_match">Uyğun nitq tapılmadı</string>
+    <string name="data_error_recognizer_busy">Nitq tanıyıcı məşğuldur</string>
+    <string name="data_error_server">Server xətası</string>
+    <string name="data_error_speech_timeout">Nitq girişi yoxdur</string>
+    <string name="data_error_unknown">Naməlum xəta</string>
+    <string name="data_error_no_speech_recognized">Nitq tanınmadı</string>
+    <string name="data_error_start_failed">Səsli tanıma başladıla bilmədi</string>
+    <string name="data_reminder_notification_title">Xatırlatma</string>
+    <string name="data_reminder_channel_name">Xatırlatmalar</string>
+    <string name="data_reminder_channel_desc">Qeyd xatırlatmaları</string>
+</resources>

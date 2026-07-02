@@ -23,5 +23,12 @@ fun TimeOption.toTime(): LocalTime = when (this) {
     TimeOption.NIGHT   -> LocalTime.of(21, 0)
 }
 
+fun TimeOption.labelRes(): Int = when (this) {
+    TimeOption.MORNING -> R.string.reminder_time_morning
+    TimeOption.NOON -> R.string.reminder_time_noon
+    TimeOption.EVENING -> R.string.reminder_time_evening
+    TimeOption.NIGHT -> R.string.reminder_time_night
+}
+
 fun combine(date: LocalDate, time: LocalTime, zone: ZoneId = ZoneId.systemDefault()): Long =
     date.atTime(time).atZone(zone).toInstant().toEpochMilli()

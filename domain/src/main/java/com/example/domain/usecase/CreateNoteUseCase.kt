@@ -1,22 +1,18 @@
 package com.example.domain.usecase
 
 import com.example.domain.models.DataResult
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.onSuccess
-import com.example.domain.processor.NoteProcessor
 import com.example.domain.repository.NotesRepository
 import javax.inject.Inject
 
 class CreateNoteUseCase @Inject constructor(
     private val notesRepository: NotesRepository,
-    private val noteProcessor: NoteProcessor
 ) {
     suspend operator fun invoke(
         title: String?,
         content: String,
         images: List<String?>?,
-        language: Language,
         reminderAt: Long? = null
     ): DataResult<Note> {
         return try {

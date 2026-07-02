@@ -1,0 +1,29 @@
+<resources>
+    <string name="reminder_title">Напомнить мне</string>
+    <string name="reminder_clear">Очистить</string>
+    <string name="reminder_when_label">КОГДА</string>
+    <string name="reminder_day_today">Сегодня</string>
+    <string name="reminder_day_tomorrow">Завтра</string>
+    <string name="reminder_day_weekend">Выходные</string>
+    <string name="reminder_day_next_week">На следующей неделе</string>
+    <string name="reminder_pick_date">Выбрать дату…</string>
+    <string name="reminder_time_label">ВРЕМЯ</string>
+    <string name="reminder_time_morning">Утро</string>
+    <string name="reminder_time_noon">День</string>
+    <string name="reminder_time_evening">Вечер</string>
+    <string name="reminder_time_night">Ночь</string>
+    <string name="reminder_pick_time">Выбрать время…</string>
+    <string name="reminder_remove">Удалить</string>
+    <string name="reminder_cancel">Отмена</string>
+    <string name="reminder_set">Установить</string>
+    <string name="reminder_box_edit">Изменить</string>
+    <string name="date_picker_previous_month_cd">Предыдущий месяц</string>
+    <string name="date_picker_next_month_cd">Следующий месяц</string>
+    <string name="note_item_pinned_cd">Закреплено</string>
+    <string name="note_item_untitled">Без названия</string>
+    <string name="note_item_screenshot_cd">Скриншот</string>
+    <string name="inline_picker_cancel">Отмена</string>
+    <string name="inline_picker_ok">ОК</string>
+    <string name="reminder_sheet_ok">ОК</string>
+    <string name="reminder_sheet_cancel">Отмена</string>
+</resources>

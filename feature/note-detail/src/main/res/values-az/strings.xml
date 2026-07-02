@@ -1,0 +1,19 @@
+<resources>
+    <string name="notedetail_toast_enable_notifications">Xatırlatma almaq üçün bildirişlərə icazə ver</string>
+    <string name="notedetail_back_cd">Geri</string>
+    <string name="notedetail_pin_cd">Qeydi bərkit</string>
+    <string name="notedetail_reminder_cd">Xatırlatma qur</string>
+    <string name="notedetail_more_cd">Digər seçimlər</string>
+    <string name="notedetail_untitled">Başlıqsız</string>
+    <string name="notedetail_reminder_label">XATIRLATMA</string>
+    <string name="notedetail_content_placeholder">Qeydini yaz...</string>
+    <string name="notedetail_screenshot_cd">Ekran şəkli</string>
+    <string name="notedetail_full_screenshot_cd">Tam ekran şəkli</string>
+    <string name="notedetail_close">Bağla</string>
+    <string name="notedetail_exact_alarm_title">Dəqiq siqnal icazəsi ver</string>
+    <string name="notedetail_exact_alarm_body">Bildirişləri vaxtında almaq üçün icazə ver.</string>
+    <string name="notedetail_open_settings">Ayarları aç</string>
+    <string name="notedetail_cancel">Ləğv et</string>
+    <string name="notedetail_add_image_cd">Şəkil əlavə et</string>
+    <string name="notedetail_add_label">Əlavə et</string>
+</resources>

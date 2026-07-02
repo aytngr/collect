@@ -1,0 +1,22 @@
+<resources>
+    <string name="overlay_notification_channel_name">Служба оверлея</string>
+    <string name="overlay_notification_channel_desc">Служба плавающей кнопки для заметок</string>
+    <string name="overlay_notification_title">Быстрая заметка</string>
+    <string name="overlay_notification_text">Плавающая кнопка активна</string>
+    <string name="overlay_saved">Сохранено!</string>
+    <string name="overlay_error">Ошибка!</string>
+    <string name="overlay_collect_label">Сбор</string>
+    <string name="overlay_quick_capture_label">быстрая заметка</string>
+    <string name="overlay_hide_cd">Скрыть</string>
+    <string name="overlay_minimize_cd">Свернуть</string>
+    <string name="overlay_close_cd">Закрыть</string>
+    <string name="overlay_add_screenshot_cd">Добавить скриншот</string>
+    <string name="overlay_reminder_cd">Напоминание</string>
+    <string name="overlay_category_cd">Категория</string>
+    <string name="overlay_save_cd">Сохранить</string>
+    <string name="overlay_screenshot_thumbnail_cd">Скриншот</string>
+    <string name="overlay_remove_screenshot_cd">Удалить скриншот</string>
+    <string name="overlay_text_placeholder">Введите текст...</string>
+    <string name="overlay_full_screenshot_cd">Скриншот целиком</string>
+    <string name="overlay_close_button">Закрыть</string>
+</resources>

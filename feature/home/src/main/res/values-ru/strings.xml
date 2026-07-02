@@ -1,0 +1,19 @@
+<resources>
+    <string name="home_search_cd">Поиск</string>
+    <string name="home_up_next">СКОРО</string>
+    <plurals name="home_reminders_count">
+        <item quantity="one">%1$d напоминание</item>
+        <item quantity="few">%1$d напоминания</item>
+        <item quantity="many">%1$d напоминаний</item>
+        <item quantity="other">%1$d напоминания</item>
+    </plurals>
+    <string name="home_jump_back_in">ПРОДОЛЖИТЬ</string>
+    <string name="home_all_notes">Все заметки</string>
+    <string name="home_capture_placeholder">Запишите мысль...</string>
+    <string name="home_quick_capture_off_title">Быстрые заметки отключены</string>
+    <string name="home_quick_capture_off_body">Включите плавающую кнопку, чтобы делать заметки из любого места.</string>
+    <string name="home_not_now">Не сейчас</string>
+    <string name="home_start_floating_widget">Запустить плавающий виджет</string>
+    <string name="home_recent_notes_title">Недавние заметки</string>
+    <string name="home_view_all">Смотреть все</string>
+</resources>

@@ -25,10 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -50,7 +52,7 @@ fun MiniDatePicker(
             IconButton(onClick = { month = month.minusMonths(1) }) {
                 Icon(
                     Icons.Default.KeyboardArrowLeft,
-                    contentDescription = "Previous month",
+                    contentDescription = stringResource(R.string.date_picker_previous_month_cd),
                     tint = AppTheme.colors.sub,
                 )
             }
@@ -64,15 +66,21 @@ fun MiniDatePicker(
             IconButton(onClick = { month = month.plusMonths(1) }) {
                 Icon(
                     Icons.Default.KeyboardArrowRight,
-                    contentDescription = "Next month",
+                    contentDescription = stringResource(R.string.date_picker_next_month_cd),
                     tint = AppTheme.colors.sub,
                 )
             }
         }
 
-        // ── weekday labels (Monday-first) ──
+        // ── weekday labels (Monday-first, locale-aware) ──
         Row(Modifier.fillMaxWidth()) {
-            listOf("M", "T", "W", "T", "F", "S", "S").forEach {
+            val weekdayLabels = remember {
+                (0..6).map { offset ->
+                    DayOfWeek.MONDAY.plus(offset.toLong())
+                        .getDisplayName(TextStyle.NARROW, Locale.getDefault())
+                }
+            }
+            weekdayLabels.forEach {
                 Text(
                     text = it,
                     modifier = Modifier.weight(1f),

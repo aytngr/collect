@@ -58,7 +58,6 @@ class NoteDetailViewModel @Inject constructor(
             NoteDetailContract.Intent.PinNote -> pinNote()
             NoteDetailContract.Intent.CheckExactAlarmPermission -> checkExactAlarmPermission()
             NoteDetailContract.Intent.RefreshPermissionDialogVisibility -> {
-                schedulePendingReminder()
                 setState { copy(showExactAlarmPermissionDialog = false) }
             }
         }

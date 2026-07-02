@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +38,7 @@ import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.Sub
 import com.example.core.designsystem.theme.TaskFlowTheme
 import com.example.core.ui.R
+import com.example.feature.notes.R as NotesR
 import com.example.core.ui.VerticalSpacer
 import com.example.core.ui.WeightSpacer
 import com.example.core.ui.noRippleClickable
@@ -65,7 +67,7 @@ fun NoteListScreen(
                 is NoteListContract.Effect.ShowToast -> {
                     Toast.makeText(
                         context,
-                        effect.message,
+                        context.getString(effect.messageRes),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -106,7 +108,7 @@ private fun NoteListContent(
             ) {
 
                 Text(
-                    "Cancel",
+                    stringResource(NotesR.string.notes_cancel),
                     style = AppTextStyle.Button,
                     color = AppTheme.colors.accent,
                     modifier = Modifier.noRippleClickable(onClick = {
@@ -115,9 +117,12 @@ private fun NoteListContent(
                         )
                     })
                 )
-                Text("${state.selectedIds.size} selected", style = AppTextStyle.SheetTitle)
                 Text(
-                    "Select all",
+                    stringResource(NotesR.string.notes_selected_count, state.selectedIds.size),
+                    style = AppTextStyle.SheetTitle
+                )
+                Text(
+                    stringResource(NotesR.string.notes_select_all),
                     style = AppTextStyle.Button,
                     color = AppTheme.colors.sub,
                     modifier = Modifier.noRippleClickable(onClick = {
@@ -134,7 +139,7 @@ private fun NoteListContent(
                 ) {
                     Icon(painter = painterResource(R.drawable.chevron), contentDescription = "")
                 }
-                Text("All notes", style = AppTextStyle.DetailHeadline)
+                Text(stringResource(NotesR.string.notes_all_notes_title), style = AppTextStyle.DetailHeadline)
                 WeightSpacer()
                 Text(
                     text = state.notes.size.toString(),
@@ -187,9 +192,9 @@ private fun NoteListContent(
             ) {
                 Text(
                     text = if (state.notes.isEmpty()) {
-                        "No notes yet. Create your first note!"
+                        stringResource(NotesR.string.notes_empty_no_notes)
                     } else {
-                        "No notes match your search."
+                        stringResource(NotesR.string.notes_empty_no_search_results)
                     },
                     style = AppTextStyle.BodySnippet,
                     color = Sub
@@ -220,22 +225,22 @@ private fun NoteListContent(
             ) {
                 SelectionAction(
                     icon = R.drawable.pin,
-                    label = "Pin",
+                    label = stringResource(NotesR.string.notes_action_pin),
                     onClick = { onIntent(NoteListContract.Intent.PinSelected) },
                 )
                 SelectionAction(
                     icon = R.drawable.move,
-                    label = "Move",
+                    label = stringResource(NotesR.string.notes_action_move),
                     onClick = { showMovePicker = true },
                 )
                 SelectionAction(
                     icon = R.drawable.merge,
-                    label = "Combine",
+                    label = stringResource(NotesR.string.notes_action_combine),
                     onClick = { onIntent(NoteListContract.Intent.CombineSelected) },
                 )
                 SelectionAction(
                     icon = R.drawable.delete,
-                    label = "Delete",
+                    label = stringResource(NotesR.string.notes_action_delete),
                     onClick = { onIntent(NoteListContract.Intent.DeleteSelected) },
                 )
             }
@@ -260,7 +265,7 @@ private fun MoveCategoryPicker(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Move to", style = AppTextStyle.SheetTitle) },
+        title = { Text(stringResource(NotesR.string.notes_move_to_title), style = AppTextStyle.SheetTitle) },
         text = {
             Column {
                 NoteCategory.entries.forEach { category ->
@@ -278,7 +283,7 @@ private fun MoveCategoryPicker(
         },
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(NotesR.string.notes_cancel)) }
         },
     )
 }

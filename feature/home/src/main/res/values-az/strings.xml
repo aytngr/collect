@@ -1,0 +1,16 @@
+<resources>
+    <string name="home_search_cd">Axtar</string>
+    <string name="home_up_next">NÖVBƏTİ</string>
+    <plurals name="home_reminders_count">
+        <item quantity="other">%1$d xatırlatma</item>
+    </plurals>
+    <string name="home_jump_back_in">QALDIĞIN YERDƏN</string>
+    <string name="home_all_notes">Bütün qeydlər</string>
+    <string name="home_capture_placeholder">Bir fikri qeyd et...</string>
+    <string name="home_quick_capture_off_title">Sürətli qeyd deaktivdir</string>
+    <string name="home_quick_capture_off_body">Hər yerdən qeyd etmək üçün üzən düyməni işə sal.</string>
+    <string name="home_not_now">İndi yox</string>
+    <string name="home_start_floating_widget">Üzən Vidceti Başlat</string>
+    <string name="home_recent_notes_title">Son Qeydlər</string>
+    <string name="home_view_all">Hamısına Bax</string>
+</resources>

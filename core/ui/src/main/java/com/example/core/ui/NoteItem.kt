@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,6 @@ import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.TaskFlowTheme
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import java.io.File
@@ -83,12 +83,12 @@ fun NoteItem(
                 if (isPinned) {
                     Icon(
                         painter = painterResource(id = R.drawable.pin),
-                        contentDescription = "Pinned",
+                        contentDescription = stringResource(R.string.note_item_pinned_cd),
                         Modifier.size(18.dp)
                     )
                     HorizontalSpacer(8.dp)
                 }
-                Text(text = title.takeIf { it.isNotEmpty() } ?: "Untitled",
+                Text(text = title.takeIf { it.isNotEmpty() } ?: stringResource(R.string.note_item_untitled),
                     style = AppTextStyle.NoteTitle,
                     modifier = Modifier.weight(1f))
                 Text(
@@ -176,7 +176,7 @@ fun GridNoteItem(
             if (isPinned) {
                 Icon(
                     painter = painterResource(id = R.drawable.pin),
-                    contentDescription = "Pinned",
+                    contentDescription = stringResource(R.string.note_item_pinned_cd),
                     Modifier.size(16.dp)
                 )
             }
@@ -197,7 +197,7 @@ fun GridNoteItem(
         image?.let {
             AsyncImage(
                 model = File(image),
-                contentDescription = "Screenshot",
+                contentDescription = stringResource(R.string.note_item_screenshot_cd),
                 modifier = Modifier
                     .size(width = 100.dp, height = 80.dp)
                     .clip(AppShapes.small),

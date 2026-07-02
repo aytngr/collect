@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -71,6 +72,7 @@ import com.example.domain.models.SaveStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+import com.example.feature.overlay.R as OverlayR
 
 @Composable
 fun QuickNotesOverlay(
@@ -102,8 +104,8 @@ fun QuickNotesOverlay(
             var saveStatus by remember { mutableStateOf<SaveStatus?>(null) }
             saveStatus?.let {
                 when (it) {
-                    SaveStatus.SUCCESS -> Text("Saved!", color = Color.Green)
-                    SaveStatus.ERROR -> Text("Error!", color = Color.Red)
+                    SaveStatus.SUCCESS -> Text(stringResource(OverlayR.string.overlay_saved), color = Color.Green)
+                    SaveStatus.ERROR -> Text(stringResource(OverlayR.string.overlay_error), color = Color.Red)
                 }
             }
             Row(
@@ -115,7 +117,7 @@ fun QuickNotesOverlay(
                 AppCircle()
                 HorizontalSpacer(8.dp)
                 Text(
-                    text = "Collect",
+                    text = stringResource(OverlayR.string.overlay_collect_label),
                     style = NoteBody
                 )
                 HorizontalSpacer(8.dp)
@@ -125,7 +127,7 @@ fun QuickNotesOverlay(
                 )
                 HorizontalSpacer(4.dp)
                 Text(
-                    text = "quick capture",
+                    text = stringResource(OverlayR.string.overlay_quick_capture_label),
                     style = AppTextStyle.Metadata,
                     color = AppTheme.colors.faint
                 )
@@ -140,7 +142,7 @@ fun QuickNotesOverlay(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.arrow_up_right),
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_hide_cd)
                     )
                 }
 
@@ -155,7 +157,7 @@ fun QuickNotesOverlay(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.minimize),
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_minimize_cd)
                     )
                 }
 
@@ -170,7 +172,7 @@ fun QuickNotesOverlay(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.x),
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_close_cd)
                     )
                 }
             }
@@ -189,7 +191,7 @@ fun QuickNotesOverlay(
                     Box {
                         if (text.isEmpty()) {
                             Text(
-                                text = "Here...",
+                                text = stringResource(OverlayR.string.overlay_text_placeholder),
                                 style = NoteBody,
                                 color = AppTheme.colors.faint
                             )
@@ -212,7 +214,7 @@ fun QuickNotesOverlay(
                         Box(Modifier.clip(AppShapes.small)) {
                             AsyncImage(
                                 model = File(screenshot),
-                                contentDescription = "Screenshot",
+                                contentDescription = stringResource(OverlayR.string.overlay_screenshot_thumbnail_cd),
                                 modifier = Modifier
                                     .size(100.dp)
                                     .clip(AppShapes.small)
@@ -240,7 +242,7 @@ fun QuickNotesOverlay(
                                 Icon(
                                     modifier = Modifier.padding(5.dp),
                                     imageVector = Icons.Outlined.Clear,
-                                    contentDescription = "Close",
+                                    contentDescription = stringResource(OverlayR.string.overlay_remove_screenshot_cd),
                                     tint = Color.Black
                                 )
                             }
@@ -280,7 +282,7 @@ fun QuickNotesOverlay(
                     Icon(
                         painter = painterResource(R.drawable.camera),
                         tint = AppTheme.colors.sub,
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_add_screenshot_cd)
                     )
                 }
                 HorizontalSpacer(8.dp)
@@ -301,7 +303,7 @@ fun QuickNotesOverlay(
                     Icon(
                         painter = painterResource(R.drawable.bell),
                         tint = if (reminderAt != null) Color.White else AppTheme.colors.sub,
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_reminder_cd)
                     )
                 }
                 HorizontalSpacer(8.dp)
@@ -315,7 +317,7 @@ fun QuickNotesOverlay(
                     Icon(
                         painter = painterResource(R.drawable.tag),
                         tint = AppTheme.colors.sub,
-                        contentDescription = "Screenshot",
+                        contentDescription = stringResource(OverlayR.string.overlay_category_cd),
                         modifier = Modifier.size(18.dp)
                     )
                     HorizontalSpacer(4.dp)
@@ -347,7 +349,7 @@ fun QuickNotesOverlay(
                     Icon(
                         painter = painterResource(R.drawable.arrow_up),
                         tint = Color.White,
-                        contentDescription = "Screenshot"
+                        contentDescription = stringResource(OverlayR.string.overlay_save_cd)
                     )
                 }
             }
@@ -365,7 +367,7 @@ fun QuickNotesOverlay(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 AsyncImage(
                     model = File(screenshots!![showImagePreview]),
-                    contentDescription = "Full Screenshot",
+                    contentDescription = stringResource(OverlayR.string.overlay_full_screenshot_cd),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -373,7 +375,7 @@ fun QuickNotesOverlay(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = { showImagePreview = -1 }) {
-                    Text("Close", color = Color.White)
+                    Text(stringResource(OverlayR.string.overlay_close_button), color = Color.White)
                 }
             }
         }

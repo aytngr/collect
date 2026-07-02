@@ -1,0 +1,19 @@
+<resources>
+    <string name="notedetail_toast_enable_notifications">Разрешите уведомления, чтобы получать напоминания</string>
+    <string name="notedetail_back_cd">Назад</string>
+    <string name="notedetail_pin_cd">Закрепить заметку</string>
+    <string name="notedetail_reminder_cd">Установить напоминание</string>
+    <string name="notedetail_more_cd">Больше опций</string>
+    <string name="notedetail_untitled">Без названия</string>
+    <string name="notedetail_reminder_label">НАПОМИНАНИЕ</string>
+    <string name="notedetail_content_placeholder">Введите заметку...</string>
+    <string name="notedetail_screenshot_cd">Скриншот</string>
+    <string name="notedetail_full_screenshot_cd">Скриншот целиком</string>
+    <string name="notedetail_close">Закрыть</string>
+    <string name="notedetail_exact_alarm_title">Разрешить точные будильники</string>
+    <string name="notedetail_exact_alarm_body">Разрешите это, чтобы получать уведомления вовремя.</string>
+    <string name="notedetail_open_settings">Открыть настройки</string>
+    <string name="notedetail_cancel">Отмена</string>
+    <string name="notedetail_add_image_cd">Добавить изображение</string>
+    <string name="notedetail_add_label">Добавить</string>
+</resources>

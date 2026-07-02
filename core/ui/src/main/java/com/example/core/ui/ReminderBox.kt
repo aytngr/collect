@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
@@ -80,7 +81,7 @@ fun ReminderBox(
 
         }
         if(isDetail){
-            TextButton(onClick = onEditClick){ Text(text = "Edit", style = AppTextStyle.Button, color = AppTheme.colors.accent)}
+            TextButton(onClick = onEditClick){ Text(text = stringResource(R.string.reminder_box_edit), style = AppTextStyle.Button, color = AppTheme.colors.accent)}
         }else{
             Icon(
                 painter = painterResource(id = R.drawable.chevron),

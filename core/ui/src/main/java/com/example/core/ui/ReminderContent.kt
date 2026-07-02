@@ -9,33 +9,22 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
@@ -46,7 +35,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -92,12 +80,12 @@ fun ReminderSheetContent(
                 tint = AppTheme.colors.accent
             )
             HorizontalSpacer(8.dp)
-            Text("Remind me", style = AppTextStyle.NoteTitle)
+            Text(stringResource(R.string.reminder_title), style = AppTextStyle.NoteTitle)
             WeightSpacer()
             if (forQuickNoteOverlay) TextButton(onClick = {
                 onRemove() }) {
                 Text(
-                    text = "Clear",
+                    text = stringResource(R.string.reminder_clear),
                     style = AppTextStyle.Button,
                     color = AppTheme.colors.sub
                 )
@@ -106,37 +94,37 @@ fun ReminderSheetContent(
 
         VerticalSpacer(12.dp)
 
-        Text("WHEN", style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+        Text(stringResource(R.string.reminder_when_label), style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ReminderChip(
-                "Today",
+                stringResource(R.string.reminder_day_today),
                 day == DayOption.TODAY.toDate()
             ) { onDay(DayOption.TODAY.toDate()) }
             ReminderChip(
-                "Tomorrow",
+                stringResource(R.string.reminder_day_tomorrow),
                 day == DayOption.TOMORROW.toDate()
             ) { onDay(DayOption.TOMORROW.toDate()) }
             ReminderChip(
-                "Weekend",
+                stringResource(R.string.reminder_day_weekend),
                 day == DayOption.WEEKEND.toDate()
             ) { onDay(DayOption.WEEKEND.toDate()) }
             ReminderChip(
-                "Next week",
+                stringResource(R.string.reminder_day_next_week),
                 day == DayOption.NEXT_WEEK.toDate()
             ) { onDay(DayOption.NEXT_WEEK.toDate()) }
             ReminderChip(
-                label = day?.takeIf { it.isCustom() }?.let(::dateLabel) ?: "Pick date…",
+                label = day?.takeIf { it.isCustom() }?.let(::dateLabel) ?: stringResource(R.string.reminder_pick_date),
                 selected = day?.isCustom() == true,
             ) { onPickDate() }
         }
 
         VerticalSpacer(12.dp)
 
-        Text("TIME", style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+        Text(stringResource(R.string.reminder_time_label), style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TimeOption.entries.forEach { opt ->
                 ReminderChip(
-                    label = opt.name.lowercase().replaceFirstChar { it.uppercase() },
+                    label = stringResource(opt.labelRes()),
                     selected = time == opt.toTime() && (day != null && combine(
                         day,
                         opt.toTime()
@@ -148,7 +136,7 @@ fun ReminderSheetContent(
                 ) { onTime(opt.toTime()) }
             }
             ReminderChip(
-                label = time?.takeIf { it.isCustom() }?.let(::timeLabel) ?: "Pick time…",
+                label = time?.takeIf { it.isCustom() }?.let(::timeLabel) ?: stringResource(R.string.reminder_pick_time),
                 selected = time?.isCustom() == true,
             ) { onPickTime() }
         }
@@ -180,7 +168,7 @@ fun ReminderSheetContent(
                 if (currentReminderAt != null) {
                     TextButton(onClick = onRemove) {
                         Text(
-                            "Remove",
+                            stringResource(R.string.reminder_remove),
                             style = AppTextStyle.Button,
                             color = AppTheme.colors.sub
                         )
@@ -188,7 +176,7 @@ fun ReminderSheetContent(
                 } else {
                     TextButton(onClick = onDismiss) {
                         Text(
-                            "Cancel",
+                            stringResource(R.string.reminder_cancel),
                             style = AppTextStyle.Button,
                             color = AppTheme.colors.sub
                         )
@@ -204,7 +192,7 @@ fun ReminderSheetContent(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppTheme.colors.accent
                     )
-                ) { Text("Set", style = AppTextStyle.Button) }
+                ) { Text(stringResource(R.string.reminder_set), style = AppTextStyle.Button) }
             }
         }
 

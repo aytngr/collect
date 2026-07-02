@@ -1,0 +1,18 @@
+<resources>
+    <string name="data_error_recognition_unavailable">Speech recognition not available on this device</string>
+    <string name="data_error_audio">Audio recording error</string>
+    <string name="data_error_client">Client error</string>
+    <string name="data_error_insufficient_permissions">Insufficient permissions</string>
+    <string name="data_error_network">Network error</string>
+    <string name="data_error_network_timeout">Network timeout</string>
+    <string name="data_error_no_match">No speech match</string>
+    <string name="data_error_recognizer_busy">Speech recognizer busy</string>
+    <string name="data_error_server">Server error</string>
+    <string name="data_error_speech_timeout">No speech input</string>
+    <string name="data_error_unknown">Unknown error</string>
+    <string name="data_error_no_speech_recognized">No speech recognized</string>
+    <string name="data_error_start_failed">Failed to start voice recognition</string>
+    <string name="data_reminder_notification_title">Reminder</string>
+    <string name="data_reminder_channel_name">Reminders</string>
+    <string name="data_reminder_channel_desc">Note reminders</string>
+</resources>

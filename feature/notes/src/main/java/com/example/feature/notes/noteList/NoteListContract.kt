@@ -1,5 +1,6 @@
 package com.example.feature.notes.noteList
 
+import androidx.annotation.StringRes
 import com.example.core.common.base.BaseEffect
 import com.example.core.common.base.BaseIntent
 import com.example.core.common.base.BaseState
@@ -36,7 +37,7 @@ class NoteListContract {
     ): BaseState
 
     sealed class Effect: BaseEffect {
-        data class ShowToast(val message: String): Effect()
+        data class ShowToast(@StringRes val messageRes: Int): Effect()
         data class ShowDeleteConfirmation(val noteId: Long): Effect()
     }
 }

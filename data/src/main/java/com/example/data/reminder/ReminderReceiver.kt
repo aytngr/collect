@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.data.R
 
 class ReminderReceiver : BroadcastReceiver() {
 
@@ -19,7 +20,8 @@ class ReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val noteId = intent.getLongExtra(EXTRA_NOTE_ID, 0L)
-        val title = intent.getStringExtra(EXTRA_TITLE)?.ifBlank { "Reminder" } ?: "Reminder"
+        val defaultTitle = context.getString(R.string.data_reminder_notification_title)
+        val title = intent.getStringExtra(EXTRA_TITLE)?.ifBlank { defaultTitle } ?: defaultTitle
 
         createChannel(context)
 
@@ -36,7 +38,7 @@ class ReminderReceiver : BroadcastReceiver() {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm) // TODO: your own notification icon
-            .setContentTitle("Reminder")
+            .setContentTitle(defaultTitle)
             .setContentText(title)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -49,8 +51,8 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private fun createChannel(context: Context) {
         val channel = NotificationChannel(
-            CHANNEL_ID, "Reminders", NotificationManager.IMPORTANCE_HIGH,
-        ).apply { description = "Note reminders" }
+            CHANNEL_ID, context.getString(R.string.data_reminder_channel_name), NotificationManager.IMPORTANCE_HIGH,
+        ).apply { description = context.getString(R.string.data_reminder_channel_desc) }
         context.getSystemService(NotificationManager::class.java)
             .createNotificationChannel(channel)
     }

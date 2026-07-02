@@ -1,7 +1,6 @@
 package com.example.data.mapper
 
 import com.example.data.models.NoteEntity
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import kotlinx.serialization.encodeToString
@@ -14,7 +13,6 @@ fun NoteEntity.toDomain(): Note {
         title = title,
         isCategoryManual = isCategoryManual,
         category = NoteCategory.valueOf(category),
-        language = Language.entries.first { it.code == language },
         createdAt = createdAt,
         updatedAt = updatedAt,
         images = images,
@@ -34,7 +32,6 @@ fun Note.toEntity(): NoteEntity {
         content = content,
         isCategoryManual = isCategoryManual,
         category = category.name,
-        language = language.code,
         createdAt = createdAt,
         updatedAt = updatedAt,
         images = images,

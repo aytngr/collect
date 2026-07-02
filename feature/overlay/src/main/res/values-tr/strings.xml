@@ -1,0 +1,22 @@
+<resources>
+    <string name="overlay_notification_channel_name">Kaplama Servisi</string>
+    <string name="overlay_notification_channel_desc">Not kaplama düğmesi servisi</string>
+    <string name="overlay_notification_title">Hızlı Not</string>
+    <string name="overlay_notification_text">Kaplama düğmesi aktif</string>
+    <string name="overlay_saved">Kaydedildi!</string>
+    <string name="overlay_error">Hata!</string>
+    <string name="overlay_collect_label">Topla</string>
+    <string name="overlay_quick_capture_label">hızlı yakalama</string>
+    <string name="overlay_hide_cd">Gizle</string>
+    <string name="overlay_minimize_cd">Küçült</string>
+    <string name="overlay_close_cd">Kapat</string>
+    <string name="overlay_add_screenshot_cd">Ekran görüntüsü ekle</string>
+    <string name="overlay_reminder_cd">Hatırlatıcı</string>
+    <string name="overlay_category_cd">Kategori</string>
+    <string name="overlay_save_cd">Kaydet</string>
+    <string name="overlay_screenshot_thumbnail_cd">Ekran görüntüsü</string>
+    <string name="overlay_remove_screenshot_cd">Ekran görüntüsünü kaldır</string>
+    <string name="overlay_text_placeholder">Buraya...</string>
+    <string name="overlay_full_screenshot_cd">Tam ekran görüntüsü</string>
+    <string name="overlay_close_button">Kapat</string>
+</resources>

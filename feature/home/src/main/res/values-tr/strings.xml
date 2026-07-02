@@ -1,0 +1,16 @@
+<resources>
+    <string name="home_search_cd">Ara</string>
+    <string name="home_up_next">SIRADAKİ</string>
+    <plurals name="home_reminders_count">
+        <item quantity="other">%1$d hatırlatıcı</item>
+    </plurals>
+    <string name="home_jump_back_in">KALDIĞIN YERDEN</string>
+    <string name="home_all_notes">Tüm notlar</string>
+    <string name="home_capture_placeholder">Bir düşünce yakala...</string>
+    <string name="home_quick_capture_off_title">Hızlı not alma kapalı</string>
+    <string name="home_quick_capture_off_body">Her yerden not almak için yüzen düğmeyi başlat.</string>
+    <string name="home_not_now">Şimdi değil</string>
+    <string name="home_start_floating_widget">Yüzen Widget\'ı Başlat</string>
+    <string name="home_recent_notes_title">Son Notlar</string>
+    <string name="home_view_all">Tümünü Gör</string>
+</resources>

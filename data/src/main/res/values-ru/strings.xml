@@ -1,0 +1,18 @@
+<resources>
+    <string name="data_error_recognition_unavailable">Распознавание речи недоступно на этом устройстве</string>
+    <string name="data_error_audio">Ошибка записи звука</string>
+    <string name="data_error_client">Ошибка клиента</string>
+    <string name="data_error_insufficient_permissions">Недостаточно разрешений</string>
+    <string name="data_error_network">Ошибка сети</string>
+    <string name="data_error_network_timeout">Тайм-аут сети</string>
+    <string name="data_error_no_match">Речь не распознана</string>
+    <string name="data_error_recognizer_busy">Распознаватель речи занят</string>
+    <string name="data_error_server">Ошибка сервера</string>
+    <string name="data_error_speech_timeout">Нет речевого ввода</string>
+    <string name="data_error_unknown">Неизвестная ошибка</string>
+    <string name="data_error_no_speech_recognized">Речь не распознана</string>
+    <string name="data_error_start_failed">Не удалось запустить распознавание речи</string>
+    <string name="data_reminder_notification_title">Напоминание</string>
+    <string name="data_reminder_channel_name">Напоминания</string>
+    <string name="data_reminder_channel_desc">Напоминания о заметках</string>
+</resources>

@@ -1,0 +1,29 @@
+<resources>
+    <string name="reminder_title">Bana hatırlat</string>
+    <string name="reminder_clear">Temizle</string>
+    <string name="reminder_when_label">NE ZAMAN</string>
+    <string name="reminder_day_today">Bugün</string>
+    <string name="reminder_day_tomorrow">Yarın</string>
+    <string name="reminder_day_weekend">Hafta sonu</string>
+    <string name="reminder_day_next_week">Gelecek hafta</string>
+    <string name="reminder_pick_date">Tarih seç…</string>
+    <string name="reminder_time_label">SAAT</string>
+    <string name="reminder_time_morning">Sabah</string>
+    <string name="reminder_time_noon">Öğlen</string>
+    <string name="reminder_time_evening">Akşam</string>
+    <string name="reminder_time_night">Gece</string>
+    <string name="reminder_pick_time">Saat seç…</string>
+    <string name="reminder_remove">Kaldır</string>
+    <string name="reminder_cancel">İptal</string>
+    <string name="reminder_set">Ayarla</string>
+    <string name="reminder_box_edit">Düzenle</string>
+    <string name="date_picker_previous_month_cd">Önceki ay</string>
+    <string name="date_picker_next_month_cd">Sonraki ay</string>
+    <string name="note_item_pinned_cd">Sabitlendi</string>
+    <string name="note_item_untitled">Başlıksız</string>
+    <string name="note_item_screenshot_cd">Ekran görüntüsü</string>
+    <string name="inline_picker_cancel">İptal</string>
+    <string name="inline_picker_ok">Tamam</string>
+    <string name="reminder_sheet_ok">Tamam</string>
+    <string name="reminder_sheet_cancel">İptal</string>
+</resources>

@@ -2,7 +2,6 @@ package com.example.feature.notes.noteList
 
 import androidx.lifecycle.viewModelScope
 import com.example.core.common.base.BaseViewModel
-import com.example.domain.models.Language
 import com.example.domain.models.Note
 import com.example.domain.models.NoteCategory
 import com.example.domain.models.onError
@@ -14,6 +13,7 @@ import com.example.domain.usecase.UpdateNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.feature.notes.R
 
 @HiltViewModel
 class NoteListViewModel @Inject constructor(
@@ -55,7 +55,7 @@ class NoteListViewModel @Inject constructor(
             currentState.notes
                 .filter { it.id in currentState.selectedIds }
                 .forEach { deleteNoteUseCase(it) }
-            sendEffect(NoteListContract.Effect.ShowToast("Notes deleted"))
+            sendEffect(NoteListContract.Effect.ShowToast(R.string.notes_toast_notes_deleted))
             clearSelection()
         }
     }
@@ -84,7 +84,7 @@ class NoteListViewModel @Inject constructor(
         val images = selected.flatMap { it.images.orEmpty() }
 
         viewModelScope.launch {
-            createNoteUseCase("", content, images, Language.AZERBAIJANI)
+            createNoteUseCase("", content, images)
             selected.forEach { deleteNoteUseCase(it) }
         }
 
@@ -130,7 +130,7 @@ class NoteListViewModel @Inject constructor(
     private fun deleteNote(note: Note) {
         viewModelScope.launch {
             deleteNoteUseCase(note).onSuccess {
-                sendEffect(NoteListContract.Effect.ShowToast("Note deleted"))
+                sendEffect(NoteListContract.Effect.ShowToast(R.string.notes_toast_note_deleted))
             }.onError {
                 setState { copy(error = it.message ?: "Failed to delete note") }
             }

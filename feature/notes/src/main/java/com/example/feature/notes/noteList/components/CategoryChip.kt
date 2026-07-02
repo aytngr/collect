@@ -11,11 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.core.designsystem.theme.AppShapes
 import com.example.core.designsystem.theme.AppTextStyle
 import com.example.core.designsystem.theme.AppTheme
 import com.example.domain.models.NoteCategory
+import com.example.feature.notes.R
 
 @Composable
 fun CategoryChip(
@@ -31,7 +33,7 @@ fun CategoryChip(
             FilterChip(
                 selected = selectedCategory == null,
                 onClick = { onCategorySelected(null) },
-                label = { Text("All", style = AppTextStyle.Chip) },
+                label = { Text(stringResource(R.string.notes_category_all), style = AppTextStyle.Chip) },
                 shape = AppShapes.extraLarge,
                 colors = FilterChipDefaults.filterChipColors(
                     labelColor = AppTheme.colors.sub,

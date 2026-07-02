@@ -8,7 +8,6 @@ data class Note(
 
     val category: NoteCategory = NoteCategory.GENERAL,
     val isCategoryManual: Boolean = false,
-    val language: Language = Language.AZERBAIJANI,
     val extractedData: Map<String, String> = emptyMap(),
 
     val ocrText: String = "",
@@ -27,10 +26,4 @@ data class Note(
 
 enum class NoteCategory {
     GENERAL, SHOPPING, FINANCE, WORK, SAVED
-}
-
-enum class Language(val code: String, val displayName: String) {
-    TURKISH("tr-TR", "Türkçe"),
-    AZERBAIJANI("az-AZ", "Azərbaycan"),
-    ENGLISH("en-US", "English")
 }
