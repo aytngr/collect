@@ -80,6 +80,7 @@ import com.example.core.designsystem.theme.AppTextStyle.DetailHeadline
 import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.TaskFlowTheme
+import com.example.core.ui.BackButton
 import com.example.core.ui.HorizontalSpacer
 import com.example.core.ui.R
 import com.example.core.ui.ReminderBox
@@ -124,13 +125,14 @@ fun NoteDetailScreen(
         }
     }
 
-    NoteDetailContent(state = state, viewModel::handleIntent)
+    NoteDetailContent(state = state, onIntent = viewModel::handleIntent, onBack = onBackClick)
 }
 
 @Composable
 fun NoteDetailContent(
     state: NoteDetailContract.State,
-    onIntent: (NoteDetailContract.Intent) -> Unit
+    onIntent: (NoteDetailContract.Intent) -> Unit,
+    onBack: () -> Unit = {}
 ) {
 
     var showImagePreview by remember { mutableIntStateOf(-1) }
@@ -180,16 +182,11 @@ fun NoteDetailContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = { /* action */ }) {
-                    Icon(
-                        painter = painterResource(R.drawable.chevron),
-                        contentDescription = stringResource(NoteDetailR.string.notedetail_back_cd)
-                    )
-                }
+                BackButton(onClick = onBack)
                 Spacer(Modifier.weight(1f))
                 IconButton(onClick = { onIntent(NoteDetailContract.Intent.PinNote) }) {
                     Icon(//todo icon
-                        painter = if (state.note.isPinned) painterResource(R.drawable.pin) else painterResource(
+                        painter = if (state.note.isPinned) painterResource(R.drawable.pinned) else painterResource(
                             R.drawable.pin
                         ),
                         contentDescription = stringResource(NoteDetailR.string.notedetail_pin_cd)
@@ -271,6 +268,7 @@ fun NoteDetailContent(
             )
 
             state.note.reminderAt?.let {
+                VerticalSpacer(Spacing.md)
                 ReminderBox(
                     isNext = it > System.currentTimeMillis(),
                     title = stringResource(NoteDetailR.string.notedetail_reminder_label),

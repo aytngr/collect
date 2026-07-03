@@ -39,6 +39,8 @@ import com.example.core.designsystem.theme.AppTheme
 import com.example.core.designsystem.theme.Spacing
 import com.example.core.designsystem.theme.Sub
 import com.example.core.designsystem.theme.TaskFlowTheme
+import com.example.core.ui.BackButton
+import com.example.core.ui.HorizontalSpacer
 import com.example.core.ui.R
 import com.example.feature.notes.R as NotesR
 import com.example.core.ui.VerticalSpacer
@@ -137,11 +139,8 @@ private fun NoteListContent(
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(50.dp)) {
-                IconButton(
-                    onClick = { onBackClick() }
-                ) {
-                    Icon(painter = painterResource(R.drawable.chevron), contentDescription = "")
-                }
+                BackButton(onClick = onBackClick)
+                HorizontalSpacer(Spacing.sm)
                 Text(stringResource(NotesR.string.notes_all_notes_title), style = AppTextStyle.DetailHeadline)
                 WeightSpacer()
                 Text(
@@ -169,6 +168,8 @@ private fun NoteListContent(
                 onIntent(NoteListContract.Intent.FilterByCategory(category))
             }
         )
+
+        VerticalSpacer(Spacing.sm)
 
         Row {
             WeightSpacer()

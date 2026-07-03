@@ -74,9 +74,6 @@ fun HomeScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    var showStartDialog by remember { mutableStateOf(false) }
-
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -170,6 +167,8 @@ private fun HomeContent(
             }
         }
 
+        VerticalSpacer(Spacing.lg)
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
@@ -192,7 +191,7 @@ private fun HomeContent(
             )
         }
 
-        Spacer(modifier = Modifier.height(Spacing.lg))
+        Spacer(modifier = Modifier.height(Spacing.md))
 
         if (state.upNextReminders.isNotEmpty()) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
@@ -206,7 +205,7 @@ private fun HomeContent(
             }
         }
 
-        VerticalSpacer(Spacing.lg)
+        VerticalSpacer(Spacing.xl)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -233,7 +232,7 @@ private fun HomeContent(
         state.recentNotes.let {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                contentPadding = PaddingValues(top = Spacing.sm, bottom = Spacing.sm),
+                contentPadding = PaddingValues(top = Spacing.md, bottom = Spacing.sm),
                 modifier = Modifier.weight(1f),
 
                 ) {

@@ -26,4 +26,5 @@
     <string name="inline_picker_ok">OK</string>
     <string name="reminder_sheet_ok">OK</string>
     <string name="reminder_sheet_cancel">Cancel</string>
+    <string name="back_button_cd">Back</string>
 </resources>

@@ -26,4 +26,5 @@
     <string name="inline_picker_ok">Tamam</string>
     <string name="reminder_sheet_ok">Tamam</string>
     <string name="reminder_sheet_cancel">İptal</string>
+    <string name="back_button_cd">Geri</string>
 </resources>
