@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.taskflow"
+    namespace = "com.aytngr.collect"
 }
 
 dependencies {

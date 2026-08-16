@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.core.navigation"
+    namespace = "com.aytngr.core.navigation"
 }
 
 dependencies {

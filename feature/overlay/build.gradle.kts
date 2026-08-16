@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.feature.overlay"
+    namespace = "com.aytngr.feature.overlay"
 }
 
 dependencies {

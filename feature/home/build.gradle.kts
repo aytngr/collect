@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.feature.home"
+    namespace = "com.aytngr.feature.home"
 }
 
 dependencies {

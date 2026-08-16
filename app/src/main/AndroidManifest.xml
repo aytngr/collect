@@ -33,10 +33,10 @@
         android:icon="@mipmap/ic_launcher"
         android:windowSoftInputMode="adjustResize"
         android:label="@string/app_name"
-        android:theme="@style/Theme.TaskFlow">
+        android:theme="@style/Theme.Collect">
 
         <service
-            android:name="com.example.feature.overlay.OverlayService"
+            android:name="com.aytngr.feature.overlay.OverlayService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false"
@@ -49,15 +49,21 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.TaskFlow">
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Collect">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="collect" android:host="notedetail" />
+            </intent-filter>
         </activity>
 
         <activity
-            android:name="com.example.feature.overlay.ScreenshotActivity"
+            android:name="com.aytngr.feature.overlay.ScreenshotActivity"
             android:theme="@style/Theme.Transparent"
             android:exported="false"
             android:excludeFromRecents="true"
@@ -65,7 +71,7 @@
             android:launchMode="singleInstance"/>
 
         <receiver
-            android:name="com.example.feature.overlay.BootReceiver"
+            android:name="com.aytngr.feature.overlay.BootReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
@@ -77,7 +83,7 @@
         </receiver>
 
         <receiver
-            android:name="com.example.data.reminder.ReminderReceiver"
+            android:name="com.aytngr.data.reminder.ReminderReceiver"
             android:exported="false" />
 
     </application>

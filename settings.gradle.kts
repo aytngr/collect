@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "TaskFlow"
+rootProject.name = "Collect"
 include(":app")
 include(":core")
 include(":domain")

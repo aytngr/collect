@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.feature.note_detail"
+    namespace = "com.aytngr.feature.note_detail"
 }
 
 dependencies {

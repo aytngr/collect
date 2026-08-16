@@ -1,0 +1,331 @@
+package com.aytngr.core.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.aytngr.core.designsystem.theme.AppShapes
+import com.aytngr.core.designsystem.theme.AppTextStyle
+import com.aytngr.core.designsystem.theme.AppTheme
+import com.aytngr.core.designsystem.theme.Spacing
+import com.aytngr.core.designsystem.theme.CollectTheme
+import com.aytngr.domain.models.Note
+import com.aytngr.domain.models.NoteCategory
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+@Composable
+fun NoteItem(
+    title: String,
+    content: String,
+    time: String,
+    isSelected: Boolean = false,
+    selectionMode: Boolean = false,
+    category: String,
+    isPinned: Boolean = false,
+    reminder: String? = null,
+    metadata: String? = null,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+) {
+
+    Row(
+        modifier = Modifier
+            .noRippleCombinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .background(shape = AppShapes.medium, color = if (selectionMode && isSelected) AppTheme.colors.accentSoft else Color.Transparent)
+
+    ) {
+        if (selectionMode) {
+            Icon(
+                painter = painterResource(if (isSelected) R.drawable.selected else R.drawable.unselected),
+                contentDescription = "",
+                tint = AppTheme.colors.accent,
+                modifier = Modifier.padding(top = Spacing.md, start = Spacing.md)
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = Spacing.md, top = Spacing.md, end = Spacing.lg, bottom = Spacing.md)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (isPinned) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.pin),
+                        contentDescription = stringResource(R.string.note_item_pinned_cd),
+                        Modifier.size(18.dp)
+                    )
+                    HorizontalSpacer(Spacing.sm)
+                }
+                Text(text = title.takeIf { it.isNotEmpty() } ?: stringResource(R.string.note_item_untitled),
+                    style = AppTextStyle.NoteTitle,
+                    modifier = Modifier.weight(1f))
+                Text(
+                    text = time, style = AppTextStyle.Metadata,
+                    color = AppTheme.colors.faint
+                )
+            }
+
+            if (content.isNotEmpty()) Text(
+                text = content,
+                style = AppTextStyle.BodySnippet,
+                color = AppTheme.colors.sub,
+                maxLines = 1,
+            )
+
+            VerticalSpacer(Spacing.sm)
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = category, style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+                HorizontalSpacer(Spacing.lg)
+                when {
+                    reminder != null -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.bell),
+                                contentDescription = "",
+                                tint = AppTheme.colors.accent,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            HorizontalSpacer(Spacing.xs)
+                            Text(
+                                text = reminder,
+                                color = AppTheme.colors.accent,
+                                style = AppTextStyle.VoiceReminderPill
+                            )
+                        }
+                    }
+
+                    metadata != null -> {
+                        Text(
+                            text = metadata,
+                            color = AppTheme.colors.accent,
+                            style = AppTextStyle.Metadata
+                        )
+
+                    }
+                }
+            }
+            VerticalSpacer(Spacing.sm)
+            HorizontalDivider(color = AppTheme.colors.line)
+        }
+    }
+}
+
+@Composable
+fun GridNoteItem(
+    title: String,
+    content: String,
+    time: String,
+    isSelected: Boolean = false,
+    selectionMode: Boolean = false,
+    category: String,
+    isPinned: Boolean = false,
+    reminder: String? = null,
+    image: String? = null,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier
+            .clip(AppShapes.large)
+            .border(
+                shape = AppShapes.large,
+                width = 1.dp,
+                color = if (selectionMode && isSelected) AppTheme.colors.accent else AppTheme.colors.line
+            )
+            .background(color = AppTheme.colors.surface)
+            .noRippleCombinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(horizontal = Spacing.lg, vertical = Spacing.md)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = category, style = AppTextStyle.Eyebrow, color = AppTheme.colors.faint)
+            WeightSpacer()
+            if (isPinned) {
+                Icon(
+                    painter = painterResource(id = R.drawable.pin),
+                    contentDescription = stringResource(R.string.note_item_pinned_cd),
+                    Modifier.size(16.dp)
+                )
+            }
+            if (selectionMode) {
+                Icon(
+                    painter = painterResource(if (isSelected) R.drawable.selected else R.drawable.unselected),
+                    contentDescription = "",
+                    tint = AppTheme.colors.accent,
+                    modifier = Modifier.padding(top = Spacing.md, start = Spacing.md)
+                )
+            }
+        }
+        VerticalSpacer(Spacing.sm)
+        Text(text = title.takeIf { it.isNotEmpty() } ?: "Untitled",
+            style = AppTextStyle.NoteTitle,
+            maxLines = 1)
+        VerticalSpacer(Spacing.sm)
+        image?.let {
+            AsyncImage(
+                model = File(image),
+                contentDescription = stringResource(R.string.note_item_screenshot_cd),
+                modifier = Modifier
+                    .size(width = 100.dp, height = 80.dp)
+                    .clip(AppShapes.small),
+                contentScale = ContentScale.Crop,
+                onError = {
+                    android.util.Log.e(
+                        "noteimg",
+                        "load failed: $image",
+                        it.result.throwable
+                    )
+                },
+            )
+        }
+        VerticalSpacer(Spacing.sm)
+        if (content.isNotEmpty()) {
+            Text(
+                text = content,
+                style = AppTextStyle.BodySnippet,
+                color = AppTheme.colors.sub,
+                maxLines = 4
+            )
+            VerticalSpacer(Spacing.sm)
+        }
+
+        Row {
+            WeightSpacer()
+            Text(
+                text = time, style = AppTextStyle.Metadata,
+                color = AppTheme.colors.faint
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun NotePreview() {
+    CollectTheme {
+        NoteItem(
+            title = "Hello",
+            content = "Hello",
+            time = "1h",
+            category = "IDEAS",
+//        reminder = "",
+//        metadata= "",
+            onClick = {},
+            onLongClick = {},
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun NoteGridPreview() {
+    CollectTheme {
+        GridNoteItem(
+            title = "Hello",
+            content = "How are you",
+            time = "1h",
+            image = "kjsndjkndja",
+            category = "IDEAS",
+//        reminder = "",
+//        metadata= "",
+            onClick = {},
+            onLongClick = {},
+        )
+    }
+}
+
+
+
+@Preview(showBackground = true)
+@Composable
+private fun NoteGridPreview2() {
+    CollectTheme {
+        GridNoteItem(
+            title = "Hello",
+            content = "How are you",
+            time = "1h",
+            image = "kjsndjkndja",
+            isSelected = true,
+            selectionMode = true,
+            category = "IDEAS",
+//        reminder = "",
+//        metadata= "",
+            onClick = {},
+            onLongClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NotePreview1() {
+    CollectTheme {
+        NoteItem(
+            title = "Hello",
+            content = "Hello",
+            time = "1h",
+            category = "IDEAS",
+//            recording = "0:10",
+            reminder = "Thu 9:00",
+//        metadata= "",
+            onClick = {},
+            onLongClick = {},
+            selectionMode = true,
+            isSelected = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NotePreview2() {
+    CollectTheme {
+        NoteItem(
+            title = "Hello",
+            content = "Hello",
+            time = "1h",
+            category = "IDEAS",
+//            recording = "0:10",
+//        reminder = "",
+            metadata = "6 items",
+            onClick = {},
+            onLongClick = {}
+        )
+    }
+}
