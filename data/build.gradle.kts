@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     testImplementation(libs.room.testing)
+    implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)

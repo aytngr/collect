@@ -1,15 +1,28 @@
 *.iml
 .gradle
-/local.properties
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Build output — `build/` (no leading slash) matches every module, not just the root.
+# The old `/build` rule missed app/build, data/build, build-logic/convention/build, etc.
+build/
+
+# Kotlin 2.x compiler session + error dumps
+.kotlin/
+
+# Android Studio / IntelliJ
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+/.idea/deviceManager.xml
+/.idea/AndroidProjectSystem.xml
+/.idea/.name
+
+# Local database dumps taken before schema changes — keep out of history
+/db_backups/
