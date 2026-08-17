@@ -16,25 +16,29 @@ class AndroidComposePlugin : Plugin<Project> {
 
             pluginManager.withPlugin("com.android.application") {
                 extensions.configure(ApplicationExtension::class.java) {
-                    configureComposeExtension(this)
+                    buildFeatures {
+                        compose = true
+                    }
                 }
                 configureComposeDependencies()
             }
 
             pluginManager.withPlugin("com.android.library") {
                 extensions.configure(LibraryExtension::class.java) {
-                    configureComposeExtension(this)
+                    buildFeatures {
+                        compose = true
+                    }
                 }
                 configureComposeDependencies()
             }
         }
     }
 
-    private fun configureComposeExtension(extension: CommonExtension<*, *, *, *, *, *>) {
-        extension.buildFeatures {
-            compose = true
-        }
-    }
+//    private fun configureComposeExtension(extension: CommonExtension<*, *, *, *, *, *>) {
+//        extension.buildFeatures {
+//            compose = true
+//        }
+//    }
 
     private fun Project.configureComposeDependencies() {
         dependencies {

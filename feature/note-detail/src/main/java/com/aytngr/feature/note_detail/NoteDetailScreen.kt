@@ -158,7 +158,7 @@ fun NoteDetailContent(
         uri ?: return@rememberLauncherForActivityResult
         scope.launch {
             val path = uri.copyToInternalStorage(context) ?: return@launch
-            val current = state.note.images.orEmpty().filterNotNull()
+            val current = state.note.images
             onIntent(NoteDetailContract.Intent.UpdateNote(images = current + path))
         }
     }
@@ -307,7 +307,7 @@ fun NoteDetailContent(
 
             VerticalSpacer(Spacing.lg)
 
-            state.note.images?.let { images ->
+            state.note.images.let { images ->
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Spacing.sm),

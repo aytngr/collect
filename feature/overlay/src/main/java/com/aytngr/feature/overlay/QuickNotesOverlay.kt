@@ -79,7 +79,7 @@ fun QuickNotesOverlay(
     text: String,
     category: String,
     reminderAt: Long?,
-    onSave: suspend (String, List<String?>?, (SaveStatus) -> Unit) -> Unit,
+    onSave: suspend (String, List<String>, (SaveStatus) -> Unit) -> Unit,
     onTextChange: (String) -> Unit,
     onRemoveScreenshot: (Int) -> Unit,
     onClose: () -> Unit,
@@ -89,7 +89,7 @@ fun QuickNotesOverlay(
     onExpand: () -> Unit,
     onAddScreenshot: () -> Unit,
     onClickCategory: () -> Unit,
-    screenshots: List<String>? = null,
+    screenshots: List<String> = emptyList(),
 ) {
     var showImagePreview by remember { mutableIntStateOf(-1) }
     var showReminderSheet by remember { mutableStateOf(false) }
@@ -209,8 +209,7 @@ fun QuickNotesOverlay(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                screenshots?.let {
-                    itemsIndexed(it) { index, screenshot ->
+                itemsIndexed(screenshots) { index, screenshot ->
 
                         Box(Modifier.clip(AppShapes.small)) {
                             AsyncImage(
@@ -248,8 +247,6 @@ fun QuickNotesOverlay(
                                 )
                             }
                         }
-
-                    }
                 }
             }
 
@@ -356,7 +353,7 @@ fun QuickNotesOverlay(
             }
         }
     }
-    if (showImagePreview != -1 && screenshots != null) {
+    if (showImagePreview in screenshots.indices) {
         Box(
             modifier = Modifier
                 .background(Color.Black.copy(alpha = 0.9f))
@@ -367,7 +364,7 @@ fun QuickNotesOverlay(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 AsyncImage(
-                    model = File(screenshots!![showImagePreview]),
+                    model = File(screenshots[showImagePreview]),
                     contentDescription = stringResource(OverlayR.string.overlay_full_screenshot_cd),
                     contentScale = ContentScale.Fit,
                     modifier = Modifier

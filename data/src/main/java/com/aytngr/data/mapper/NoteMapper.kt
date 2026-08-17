@@ -12,7 +12,8 @@ fun NoteEntity.toDomain(): Note {
         content = content,
         title = title,
         isCategoryManual = isCategoryManual,
-        category = NoteCategory.valueOf(category),
+        category = NoteCategory.entries.firstOrNull { it.name == category }
+            ?: NoteCategory.GENERAL,
         createdAt = createdAt,
         updatedAt = updatedAt,
         images = images,
@@ -21,7 +22,9 @@ fun NoteEntity.toDomain(): Note {
         reminderAt = reminderAt,
         orderN = orderN,
         isPinned = isPinned,
-        extractedData = Json.decodeFromString(extractedData)
+        extractedData = runCatching {
+            Json.decodeFromString<Map<String, String>>(extractedData)
+        }.getOrDefault(emptyMap())
     )
 }
 

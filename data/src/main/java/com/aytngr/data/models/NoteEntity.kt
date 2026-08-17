@@ -9,7 +9,7 @@ data class NoteEntity(
     val id: Long = 0,
     val content: String = "",
     val title: String = "",
-    val images: List<String?>? = null,
+    val images: List<String> = emptyList(),
 
     val category: String,
     val isCategoryManual: Boolean = false,

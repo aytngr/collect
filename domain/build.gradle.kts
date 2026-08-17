@@ -12,7 +12,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
-    testImplementation(libs.room.testing)
+    androidTestImplementation(libs.room.testing)
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(libs.kotlinx.serialization.json)
