@@ -62,7 +62,7 @@ fun NotesView(
                     category = note.category.name,
                     isPinned = note.isPinned,
                     reminder = note.reminderAt?.formatTimeAgo(),
-                    image = note.images?.firstOrNull(),
+                    image = note.images.firstOrNull(),
                     isSelected = note.id in selectedIds,
                     selectionMode = selectionMode,
                     onClick = { onItemClick(note.id) },

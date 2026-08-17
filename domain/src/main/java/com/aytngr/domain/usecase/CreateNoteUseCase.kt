@@ -12,7 +12,7 @@ class CreateNoteUseCase @Inject constructor(
     suspend operator fun invoke(
         title: String?,
         content: String,
-        images: List<String?>?,
+        images: List<String>,
         reminderAt: Long? = null
     ): DataResult<Note> {
         return try {

@@ -6,18 +6,15 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 class AndroidLibraryPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("com.android.library")
-            pluginManager.apply("org.jetbrains.kotlin.android")
 
             extensions.configure<LibraryExtension> {
-                compileSdk = 36
+                compileSdk = 37
 
                 defaultConfig {
                     minSdk = 26
@@ -41,14 +38,13 @@ class AndroidLibraryPlugin : Plugin<Project> {
                 }
 
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_11
-                    targetCompatibility = JavaVersion.VERSION_11
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
                 }
-            }
 
-            extensions.configure<KotlinAndroidProjectExtension> {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
+                lint {
+                    abortOnError = true
+                    baseline = file("lint-baseline.xml")
                 }
             }
 

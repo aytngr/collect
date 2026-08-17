@@ -376,7 +376,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
     private suspend fun saveNoteToDatabase(
         noteText: String,
-        images: List<String?>?,
+        images: List<String>,
         onSaveStatus: (SaveStatus) -> Unit
     ) {
         createNoteUseCase(

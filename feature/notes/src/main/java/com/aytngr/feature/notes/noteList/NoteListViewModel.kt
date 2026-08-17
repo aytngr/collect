@@ -81,7 +81,7 @@ class NoteListViewModel @Inject constructor(
     private fun combineSelected() {
         val selected = currentState.notes.filter { it.id in currentState.selectedIds }
         val content = selected.joinToString("\n\n") { "${it.title}\n${it.content}"  }
-        val images = selected.flatMap { it.images.orEmpty() }
+        val images = selected.flatMap { it.images }
 
         viewModelScope.launch {
             createNoteUseCase("", content, images)
