@@ -3,7 +3,6 @@ package com.aytngr.feature.overlay
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -49,15 +48,13 @@ import com.aytngr.domain.usecase.CreateNoteUseCase
 import com.aytngr.domain.usecase.GetWidgetLocationUseCase
 import com.aytngr.domain.usecase.SaveWidgetLocationUseCase
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @AndroidEntryPoint
 class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
@@ -85,7 +82,6 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
 
     @Inject
     lateinit var createNoteUseCase: CreateNoteUseCase
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private var screenshotManager: ScreenshotManager? = null
 
@@ -123,19 +119,17 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
         screenshotManager = ScreenshotManager(this)
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
-            val notification = createNotification()
+        createNotificationChannel()
+        val notification = createNotification()
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startForeground(
-                    NOTIFICATION_ID,
-                    notification,
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                )
-            } else {
-                startForeground(NOTIFICATION_ID, notification)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
         }
 
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
@@ -258,7 +252,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                     CollectTheme {
                         QuickNotesOverlay(
                             text = currentText,
-                            category = category.name,
+                            category = category,
                             onClickCategory = {
                                 val next =
                                     NoteCategory.entries[(category.ordinal + 1) % NoteCategory.entries.size]
@@ -291,10 +285,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
             popupParams = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                else
-                    WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_DIM_BEHIND,
                 PixelFormat.TRANSLUCENT
             ).apply {
@@ -318,7 +309,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 hideQuickNotePopup()
                 widgetView?.visibility = INVISIBLE
                 showScreenshotAnimation()
-                delay(250)
+                delay(250.milliseconds)
                 hideScreenshotAnimation()
                 val screenshot = screenshotManager?.captureScreenshot()
                 val path = screenshot?.saveToStorage(this@OverlayService)
@@ -389,6 +380,7 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
                 onSaveStatus(SaveStatus.SUCCESS)
                 currentText = ""
                 currentScreenshots.clear()
+                reminderAt = null
             }
             .onError {
                 onSaveStatus(SaveStatus.ERROR)
@@ -443,8 +435,10 @@ class OverlayService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStat
     override fun onDestroy() {
         super.onDestroy()
         widgetView?.let { windowManager.removeView(it) }
+        windowManager.removeView(quickNoteView)
+        windowManager.removeView(screenshotAnimationView)
+        screenshotManager?.release()
         store.clear()
-        coroutineScope.cancel()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         isRunning = false
     }
