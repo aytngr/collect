@@ -26,9 +26,6 @@ class NoteDetailContract {
         val note: Note,
         val isLoading: Boolean = false,
         val showExactAlarmPermissionDialog: Boolean = false,
-        val createdTime: String = "",
-        val reminder: String = "",
-        val editedTime: String = "",
         val error: String? = null,
     ): BaseState
 

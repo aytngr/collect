@@ -3,7 +3,6 @@ package com.aytngr.feature.note_detail
 import android.os.Build
 import androidx.lifecycle.viewModelScope
 import com.aytngr.core.common.base.BaseViewModel
-import com.aytngr.core.common.base.formatCreatedAt
 import com.aytngr.core.common.base.permissions.PermissionHandler
 import com.aytngr.domain.models.Note
 import com.aytngr.domain.models.onError
@@ -16,12 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,6 +59,7 @@ class NoteDetailViewModel @Inject constructor(
     private fun schedulePendingReminder() {
         pendingReminder?.let {
             setReminder(it)
+            pendingReminder = null
         }
     }
     private fun checkExactAlarmPermission() {
@@ -77,13 +71,13 @@ class NoteDetailViewModel @Inject constructor(
     }
 
     private fun setReminder(at: Long) {
-        setState { copy(note = note.copy(reminderAt = at), reminder = at.formatCreatedAt()) }
+        setState { copy(note = note.copy(reminderAt = at)) }
         persist()
         reminderScheduler.schedule(currentState.note.id, currentState.note.title, at)
     }
 
     private fun clearReminder() {
-        setState { copy(note = note.copy(reminderAt = null), reminder = "") }
+        setState { copy(note = note.copy(reminderAt = null)) }
         persist()
         reminderScheduler.cancel(currentState.note.id)
     }
@@ -101,8 +95,7 @@ class NoteDetailViewModel @Inject constructor(
                     content = content ?: note.content,
                     images = images ?: note.images,
                     updatedAt = System.currentTimeMillis()
-                ),
-                editedTime = formatEditedTime(System.currentTimeMillis())
+                )
             )
         }
 
@@ -133,9 +126,6 @@ class NoteDetailViewModel @Inject constructor(
                             copy(
                                 isLoading = false,
                                 note = it,
-                                createdTime = it.createdAt.formatCreatedAt(),
-                                editedTime = formatEditedTime(it.updatedAt),
-                                reminder = it.reminderAt?.formatCreatedAt() ?: run { "" }
                             )
                         }
                     } ?: run { setState { copy(isLoading = false, error = "Not found") } }
@@ -157,31 +147,5 @@ class NoteDetailViewModel @Inject constructor(
         }
     }
 
-    private fun formatEditedTime(createdTimeMillis: Long): String {
-        val now = Instant.now()
-        val created = Instant.ofEpochMilli(createdTimeMillis)
-
-        val duration = Duration.between(created, now)
-
-        val minutes = duration.toMinutes()
-        val hours = duration.toHours()
-        val days = duration.toDays()
-
-        return when {
-            minutes < 1 -> "Edited just now"
-            minutes < 60 -> "Edited ${minutes}m ago"
-            hours < 24 -> "Edited${hours}h ago"
-            days == 1L -> " Edited yesterday"
-            days < 7 -> "Edited ${days}d ago"
-            else -> {
-                val formatter = DateTimeFormatter.ofPattern("d MMM")
-                    .withLocale(Locale.getDefault())
-                    .withZone(java.time.ZoneId.systemDefault())
-
-                "Edited on ${formatter.format(created)}"
-            }
-        }
-
-    }
 
 }

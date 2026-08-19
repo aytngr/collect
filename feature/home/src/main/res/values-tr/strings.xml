@@ -13,4 +13,8 @@
     <string name="home_start_floating_widget">Yüzen Widget\'ı Başlat</string>
     <string name="home_recent_notes_title">Son Notlar</string>
     <string name="home_view_all">Tümünü Gör</string>
+    <string name="home_greeting_morning">Günaydın</string>
+    <string name="home_greeting_afternoon">İyi günler</string>
+    <string name="home_greeting_evening">İyi akşamlar</string>
+    <string name="home_greeting_night">İyi geceler</string>
 </resources>

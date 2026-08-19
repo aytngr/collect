@@ -1,5 +1,6 @@
 package com.aytngr.feature.home
 
+import androidx.annotation.StringRes
 import com.aytngr.core.common.base.BaseEffect
 import com.aytngr.core.common.base.BaseIntent
 import com.aytngr.core.common.base.BaseState
@@ -8,7 +9,7 @@ import com.aytngr.domain.models.Note
 class HomeContract {
     sealed class Intent : BaseIntent {
         object CreateNewNote : Intent()
-        object RefreshOverlayStatus : Intent()
+        data class RefreshOverlayStatus (val show: Boolean) : Intent()
         object StartOverlay : Intent()
     }
 
@@ -16,13 +17,11 @@ class HomeContract {
         val upNextReminders: List<Note> = emptyList(),
         val transcribedText: String = "",
         val recentNotes: List<Note> = emptyList(),
-        val timeAgo: List<String> = emptyList(),
         val isLoading: Boolean = false,
         val showOverlayDialog: Boolean = false,
         val error: String? = null,
         val volumeLevel: Float = 0f,
-        val date: String = "",
-        val greeting: String = "",
+        @StringRes val greetingRes: Int = R.string.home_greeting_morning,
         val reminderCount: Int = 0
     ) : BaseState
 

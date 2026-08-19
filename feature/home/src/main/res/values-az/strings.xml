@@ -13,4 +13,8 @@
     <string name="home_start_floating_widget">Üzən Vidceti Başlat</string>
     <string name="home_recent_notes_title">Son Qeydlər</string>
     <string name="home_view_all">Hamısına Bax</string>
+    <string name="home_greeting_morning">Sabahınız xeyir</string>
+    <string name="home_greeting_afternoon">Günortanız xeyir</string>
+    <string name="home_greeting_evening">Axşamınız xeyir</string>
+    <string name="home_greeting_night">Gecəniz xeyrə</string>
 </resources>

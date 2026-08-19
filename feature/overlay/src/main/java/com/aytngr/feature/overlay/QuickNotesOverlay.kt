@@ -73,11 +73,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import com.aytngr.feature.overlay.R as OverlayR
+import com.aytngr.core.ui.labelRes
 
 @Composable
 fun QuickNotesOverlay(
     text: String,
-    category: String,
+    category: NoteCategory,
     reminderAt: Long?,
     onSave: suspend (String, List<String>, (SaveStatus) -> Unit) -> Unit,
     onTextChange: (String) -> Unit,
@@ -320,7 +321,7 @@ fun QuickNotesOverlay(
                     )
                     HorizontalSpacer(4.dp)
                     Text(
-                        text = category.lowercase().replaceFirstChar { it.uppercase() },
+                        text = stringResource(category.labelRes()),
                         style = AppTextStyle.BodySnippet,
                         color = AppTheme.colors.sub
                     )
@@ -394,7 +395,7 @@ fun QuickNotes() {
             onRemoveScreenshot = {},
             onAddScreenshot = {},
             screenshots = emptyList(),
-            category = NoteCategory.GENERAL.name,
+            category = NoteCategory.GENERAL,
             onClickCategory = {},
             reminderAt = null,
             onSetReminder = {},

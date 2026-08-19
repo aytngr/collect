@@ -5,23 +5,19 @@ import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.aytngr.domain.usecase.GetPermissionDataUseCase
-import com.aytngr.domain.usecase.SavePermissionDataUseCase
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
+/**
+ * Invisible activity whose only job is to host the MediaProjection consent dialog,
+ * which a Service cannot show itself, and hand the result back to [OverlayService].
+ */
 @AndroidEntryPoint
 class ScreenshotActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var savePermissionDataUseCase: SavePermissionDataUseCase
-
-    @Inject
-    lateinit var getPermissionDataUseCase: GetPermissionDataUseCase
-
     companion object {
-        const val REQUEST_MEDIA_PROJECTION = 1001
         const val IS_MEDIA_PROJECTION_INITIALIZED = "IS_MEDIA_PROJECTION_INITIALIZED"
 
         fun start(context: Context, mediaProjection: Boolean?) {
@@ -33,66 +29,48 @@ class ScreenshotActivity : AppCompatActivity() {
         }
     }
 
+    private val mediaProjectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        val data = result.data
+        if (result.resultCode == RESULT_OK && data != null) {
+            notifyService(OverlayService.ACTION_SCREENSHOT_PERMISSION_GRANTED) {
+                putExtra(OverlayService.EXTRA_RESULT_CODE, result.resultCode)
+                putExtra(OverlayService.EXTRA_RESULT_DATA, data)
+            }
+        } else {
+            notifyService(OverlayService.ACTION_SCREENSHOT_PERMISSION_DENIED)
+        }
+        finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val mediaProjection = intent.getBooleanExtra(IS_MEDIA_PROJECTION_INITIALIZED, false)
+        if (savedInstanceState != null) return
 
-        if (!mediaProjection) {
-            val mediaProjectionManager =
-                getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-            startActivityForResult(
-                mediaProjectionManager.createScreenCaptureIntent(),
-                REQUEST_MEDIA_PROJECTION
-            )
+        val hasProjection = intent.getBooleanExtra(IS_MEDIA_PROJECTION_INITIALIZED, false)
+
+        val mustAsk = !hasProjection ||
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+
+        if (mustAsk) {
+            val manager = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+            mediaProjectionLauncher.launch(manager.createScreenCaptureIntent())
         } else {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE){
-                    val mediaProjectionManager =
-                        getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-                    startActivityForResult(
-                        mediaProjectionManager.createScreenCaptureIntent(),
-                        REQUEST_MEDIA_PROJECTION
-                    )
-                }else{
-                    val intent = Intent(this@ScreenshotActivity, OverlayService::class.java).apply {
-                        setAction(OverlayService.Companion.ACTION_SCREENSHOT_PERMISSION_GRANTED)
-                        putExtra(OverlayService.Companion.EXTRA_RESULT_CODE, RESULT_OK)
-                    }
-                    startService(intent)
-                    finish()
-                }
-
-            } catch (e: Exception) {
-                val mediaProjectionManager =
-                    getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-                startActivityForResult(
-                    mediaProjectionManager.createScreenCaptureIntent(),
-                    REQUEST_MEDIA_PROJECTION
-                )
+            notifyService(OverlayService.ACTION_SCREENSHOT_PERMISSION_GRANTED) {
+                putExtra(OverlayService.EXTRA_RESULT_CODE, RESULT_OK)
             }
+            finish()
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_MEDIA_PROJECTION) {
-            if (resultCode == RESULT_OK && data != null) {
-                val intent = Intent(this, OverlayService::class.java).apply {
-                    setAction(OverlayService.Companion.ACTION_SCREENSHOT_PERMISSION_GRANTED)
-                    putExtra(OverlayService.Companion.EXTRA_RESULT_CODE, resultCode)
-                    putExtra(OverlayService.Companion.EXTRA_RESULT_DATA, data)
-                }
-                startService(intent)
-            } else {
-                val intent = Intent(this, OverlayService::class.java).apply {
-                    setAction(OverlayService.Companion.ACTION_SCREENSHOT_PERMISSION_DENIED)
-                }
-                startService(intent)
+    private fun notifyService(action: String, extras: Intent.() -> Unit = {}) {
+        startService(
+            Intent(this, OverlayService::class.java).apply {
+                this.action = action
+                extras()
             }
-        }
-
-        finish()
+        )
     }
 }

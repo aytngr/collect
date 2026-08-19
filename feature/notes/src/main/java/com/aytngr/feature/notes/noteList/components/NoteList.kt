@@ -9,12 +9,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.aytngr.core.common.base.formatTimeAgo
 import com.aytngr.core.designsystem.theme.Spacing
 import com.aytngr.core.ui.GridNoteItem
 import com.aytngr.core.ui.NoteItem
+import com.aytngr.core.ui.createdAtLabel
+import com.aytngr.core.ui.timeAgoLabel
 import com.aytngr.domain.models.Note
 import com.aytngr.feature.notes.noteList.enums.ViewMode
+import androidx.compose.ui.res.stringResource
+import com.aytngr.core.ui.labelRes
 
 @Composable
 fun NotesView(
@@ -35,10 +38,10 @@ fun NotesView(
                 NoteItem(
                     title = note.title,
                     content = note.content,
-                    time = note.updatedAt.formatTimeAgo(),
-                    category = note.category.name,
+                    time = timeAgoLabel(note.updatedAt),
+                    category = stringResource(note.category.labelRes()),
                     isPinned = note.isPinned,
-                    reminder = note.reminderAt?.formatTimeAgo(),
+                    reminder = note.reminderAt?.let { createdAtLabel(it) },
                     metadata = null,
                     isSelected = note.id in selectedIds,
                     selectionMode = selectionMode,
@@ -58,10 +61,10 @@ fun NotesView(
                 GridNoteItem(
                     title = note.title,
                     content = note.content,
-                    time = note.updatedAt.formatTimeAgo(),
-                    category = note.category.name,
+                    time = timeAgoLabel(note.updatedAt),
+                    category = stringResource(note.category.labelRes()),
                     isPinned = note.isPinned,
-                    reminder = note.reminderAt?.formatTimeAgo(),
+                    reminder = note.reminderAt?.let { createdAtLabel(it) },
                     image = note.images.firstOrNull(),
                     isSelected = note.id in selectedIds,
                     selectionMode = selectionMode,

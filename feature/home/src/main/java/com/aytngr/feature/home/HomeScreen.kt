@@ -4,6 +4,10 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,38 +36,36 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.aytngr.core.common.base.formatCreatedAt
-import com.aytngr.core.common.base.formatDate
 import com.aytngr.core.designsystem.theme.AppShapes
 import com.aytngr.core.designsystem.theme.AppTextStyle
 import com.aytngr.core.designsystem.theme.AppTheme
 import com.aytngr.core.designsystem.theme.Spacing
 import com.aytngr.core.designsystem.theme.CollectTheme
+import com.aytngr.core.common.base.formatDate
 import com.aytngr.core.ui.NoteItem
+import com.aytngr.core.ui.createdAtLabel
+import com.aytngr.core.ui.timeAgoLabel
+import java.time.LocalDate
 import com.aytngr.core.ui.R
 import com.aytngr.core.ui.ReminderBox
 import com.aytngr.core.ui.VerticalSpacer
 import com.aytngr.core.ui.noRippleClickable
 import com.aytngr.domain.models.Note
 import com.aytngr.feature.home.R as HomeR
+import androidx.core.net.toUri
+import com.aytngr.core.ui.labelRes
 
 @Composable
 fun HomeScreen(
@@ -83,13 +85,13 @@ fun HomeScreen(
                     context,
                     effect.error,
                     Toast.LENGTH_SHORT
-                )
+                ).show()
 
                 is HomeContract.Effect.ShowToast -> Toast.makeText(
                     context,
                     effect.message,
                     Toast.LENGTH_SHORT
-                )
+                ).show()
             }
         }
     }
@@ -110,13 +112,14 @@ private fun HomeContent(
     onNavigateToNotesList: () -> Unit
 ) {
 
-    val context = LocalContext.current
-    if (!LocalInspectionMode.current && !Settings.canDrawOverlays(context)) {
-        val intent = Intent(
-            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-            "package:${context.packageName}".toUri()
-        )
-        context.startActivity(intent)
+    val context = LocalContext.current.applicationContext
+
+    val overlayPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Settings.canDrawOverlays(context)) {
+            onIntent(HomeContract.Intent.StartOverlay)
+        }
     }
 
     Column(
@@ -132,12 +135,12 @@ private fun HomeContent(
         ) {
             Column {
                 Text(
-                    text = state.date,
+                    text = LocalDate.now().formatDate(),
                     style = AppTextStyle.Eyebrow,
                     color = AppTheme.colors.faint
                 )
                 Text(
-                    text = state.greeting,
+                    text = stringResource(state.greetingRes),
                     style = AppTextStyle.GreetingTitle,
                     modifier = Modifier.padding(vertical = Spacing.sm)
                 )
@@ -199,7 +202,7 @@ private fun HomeContent(
                     ReminderBox(
                         isNext = (index == 0),
                         title = reminder.title,
-                        date = reminder.reminderAt!!.formatCreatedAt()
+                        date = createdAtLabel(reminder.reminderAt!!)
                     )
                 }
             }
@@ -240,8 +243,8 @@ private fun HomeContent(
                     NoteItem(
                         title = note.title,
                         content = note.content,
-                        time = state.timeAgo[index],
-                        category = note.category.name,
+                        time = timeAgoLabel(note.createdAt),
+                        category = stringResource(note.category.labelRes()),
                         isPinned = note.isPinned,
                         reminder = null,
                         metadata = null,
@@ -292,13 +295,13 @@ private fun HomeContent(
 
         if(state.showOverlayDialog){
             AlertDialog(
-                onDismissRequest = { onIntent(HomeContract.Intent.RefreshOverlayStatus) },
+                onDismissRequest = { onIntent(HomeContract.Intent.RefreshOverlayStatus(false)) },
                 title = { Text(stringResource(HomeR.string.home_quick_capture_off_title)) },
                 text = { Text(stringResource(HomeR.string.home_quick_capture_off_body)) },
                 confirmButton = {
-                    StartFloatingServiceButton({ onIntent(HomeContract.Intent.StartOverlay) })
+                    StartFloatingServiceButton({ onIntent(HomeContract.Intent.StartOverlay) }, overlayPermissionLauncher)
                 },
-                dismissButton = { TextButton(onClick = { onIntent(HomeContract.Intent.RefreshOverlayStatus) }) { Text(stringResource(HomeR.string.home_not_now)) } },
+                dismissButton = { TextButton(onClick = { onIntent(HomeContract.Intent.RefreshOverlayStatus(false)) }) { Text(stringResource(HomeR.string.home_not_now)) } },
             )
         }
 
@@ -306,18 +309,20 @@ private fun HomeContent(
 }
 
 @Composable
-fun StartFloatingServiceButton(startOverlay: () -> Unit) {
+fun StartFloatingServiceButton(
+    startOverlay: () -> Unit,
+    overlayPermissionLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
     val context = LocalContext.current.applicationContext
 
     Button(onClick = {
         if (Settings.canDrawOverlays(context)) {
             startOverlay()
         } else {
-            val intent = Intent(
+            overlayPermissionLauncher.launch(Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:${context.packageName}")
-            )
-            context.startActivity(intent)
+                "package:${context.packageName}".toUri()
+            ))
         }
     }) {
         Text(stringResource(HomeR.string.home_start_floating_widget))
@@ -362,8 +367,6 @@ private fun HomeContentPreview() {
     CollectTheme {
         HomeContent(
             state = HomeContract.State(
-                date = "Sunday, June 1",
-                greeting = "Good morning, Aytan",
                 recentNotes = emptyList(),
                 upNextReminders = listOf(Note(title = "Hello", reminderAt = 264723647832647))
             ),

@@ -27,4 +27,22 @@
     <string name="reminder_sheet_ok">OK</string>
     <string name="reminder_sheet_cancel">Cancel</string>
     <string name="back_button_cd">Back</string>
+    <string name="category_general">General</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_finance">Finance</string>
+    <string name="category_work">Work</string>
+    <string name="category_saved">Saved</string>
+    <string name="time_today">Today</string>
+    <string name="time_yesterday">Yesterday</string>
+    <string name="time_just_now">Just now</string>
+    <string name="time_minutes_short">%1$dm</string>
+    <string name="time_hours_short">%1$dh</string>
+    <string name="time_days_short">%1$dd</string>
+    <string name="time_day_at_time">%1$s · %2$s</string>
+    <string name="time_edited_just_now">Edited just now</string>
+    <string name="time_edited_minutes">Edited %1$dm ago</string>
+    <string name="time_edited_hours">Edited %1$dh ago</string>
+    <string name="time_edited_yesterday">Edited yesterday</string>
+    <string name="time_edited_days">Edited %1$dd ago</string>
+    <string name="time_edited_on">Edited on %1$s</string>
 </resources>

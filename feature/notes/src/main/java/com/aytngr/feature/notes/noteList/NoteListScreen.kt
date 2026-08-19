@@ -53,6 +53,7 @@ import com.aytngr.feature.notes.noteList.components.NotesView
 import com.aytngr.feature.notes.noteList.components.SearchBar
 import com.aytngr.feature.notes.noteList.components.ViewModeToggle
 import com.aytngr.feature.notes.noteList.enums.ViewMode
+import com.aytngr.core.ui.labelRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -273,7 +274,7 @@ private fun MoveCategoryPicker(
             Column {
                 NoteCategory.entries.forEach { category ->
                     Text(
-                        text = category.name.lowercase().replaceFirstChar { it.uppercase() },
+                        text = stringResource(category.labelRes()),
                         style = AppTextStyle.NoteBody,
                         color = AppTheme.colors.sub,
                         modifier = Modifier

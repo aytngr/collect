@@ -48,7 +48,7 @@ class NoteListViewModel @Inject constructor(
     }
 
     private fun selectAll(){
-        setState { copy(selectedIds = selectedIds + notes.map { it.id }) }
+        setState { copy(selectedIds = selectedIds + filteredNotes.map { it.id }, selectionMode = true) }
     }
     private fun deleteSelection() {
         viewModelScope.launch {
@@ -79,13 +79,16 @@ class NoteListViewModel @Inject constructor(
     }
 
     private fun combineSelected() {
+        if (currentState.selectedIds.size < 2) return
         val selected = currentState.notes.filter { it.id in currentState.selectedIds }
         val content = selected.joinToString("\n\n") { "${it.title}\n${it.content}"  }
         val images = selected.flatMap { it.images }
 
         viewModelScope.launch {
             createNoteUseCase("", content, images)
-            selected.forEach { deleteNoteUseCase(it) }
+                .onSuccess {
+                    selected.forEach { deleteNoteUseCase(it) }
+                }
         }
 
         clearSelection()
@@ -175,7 +178,7 @@ class NoteListViewModel @Inject constructor(
             filtered = filtered.filter { it.category == category }
         }
         if (searchQuery.isNotBlank()) {
-            filtered = filtered.filter { it.title.contains(searchQuery, ignoreCase = true) }
+            filtered = filtered.filter { it.title.contains(searchQuery, ignoreCase = true) || it.content.contains(searchQuery, ignoreCase = true)}
         }
 
         // pinned first, then most-recently edited

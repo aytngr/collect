@@ -130,44 +130,6 @@ class ScreenshotManager(private val context: Context) {
         }
     }
 
-    fun createThumbnail(bitmap: Bitmap, maxWidth: Int = 200, maxHeight: Int = 200): Bitmap {
-        if (bitmap.width == 0 || bitmap.height == 0) {
-            Log.e(TAG, "Cannot create thumbnail from empty bitmap!")
-            return bitmap
-        }
-
-        val ratio = minOf(
-            maxWidth.toFloat() / bitmap.width,
-            maxHeight.toFloat() / bitmap.height
-        )
-
-        val newWidth = (bitmap.width * ratio).toInt()
-        val newHeight = (bitmap.height * ratio).toInt()
-
-        Log.d(TAG, "Creating thumbnail: ${bitmap.width}x${bitmap.height} -> ${newWidth}x${newHeight}")
-
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-    }
-
-    fun bitmapToByteArray(bitmap: Bitmap, quality: Int = 80): ByteArray {
-        if (bitmap.width == 0 || bitmap.height == 0) {
-            Log.e(TAG, "Cannot compress empty bitmap!")
-            return ByteArray(0)
-        }
-
-        val stream = ByteArrayOutputStream()
-        val success = bitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream)
-
-        if (!success) {
-            Log.e(TAG, "Bitmap compression failed!")
-            return ByteArray(0)
-        }
-
-        val bytes = stream.toByteArray()
-        Log.d(TAG, "Bitmap compressed to ${bytes.size} bytes")
-        return bytes
-    }
-
     fun release() {
         cleanupCapture()
         mediaProjection?.stop()

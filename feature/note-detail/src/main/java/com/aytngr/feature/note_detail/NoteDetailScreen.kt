@@ -8,6 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,6 +57,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -81,6 +84,8 @@ import com.aytngr.core.designsystem.theme.AppTheme
 import com.aytngr.core.designsystem.theme.Spacing
 import com.aytngr.core.designsystem.theme.CollectTheme
 import com.aytngr.core.ui.BackButton
+import com.aytngr.core.ui.createdAtLabel
+import com.aytngr.core.ui.editedLabel
 import com.aytngr.core.ui.HorizontalSpacer
 import com.aytngr.core.ui.R
 import com.aytngr.core.ui.ReminderBox
@@ -94,6 +99,7 @@ import com.aytngr.feature.note_detail.ops.copyToInternalStorage
 import kotlinx.coroutines.launch
 import java.io.File
 import com.aytngr.feature.note_detail.R as NoteDetailR
+import com.aytngr.core.ui.labelRes
 
 @Composable
 fun NoteDetailScreen(
@@ -109,8 +115,6 @@ fun NoteDetailScreen(
         val obs = LifecycleEventObserver { _, e ->
             if (e == Lifecycle.Event.ON_STOP)
                 viewModel.handleIntent(NoteDetailContract.Intent.SaveNow)
-            if (e == Lifecycle.Event.ON_RESUME)
-                viewModel.handleIntent(NoteDetailContract.Intent.SchedulePendingReminder)
         }
         lifecycleOwner.lifecycle.addObserver(obs)
         onDispose { lifecycleOwner.lifecycle.removeObserver(obs) }
@@ -123,6 +127,11 @@ fun NoteDetailScreen(
                 NoteDetailContract.Effect.NavigateBack -> onBackClick()
             }
         }
+    }
+
+    BackHandler(enabled = true) {
+        viewModel.handleIntent(NoteDetailContract.Intent.SaveNow)
+        onBackClick()
     }
 
     NoteDetailContent(state = state, onIntent = viewModel::handleIntent, onBack = onBackClick)
@@ -163,6 +172,17 @@ fun NoteDetailContent(
         }
     }
 
+    val exactAlarmLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
+    }
+
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     if (state.isLoading) {
         Box(
@@ -218,7 +238,7 @@ fun NoteDetailContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = state.note.category.name,
+                    text = stringResource(state.note.category.labelRes()),
                     style = AppTextStyle.Eyebrow,
                     color = AppTheme.colors.faint
                 )
@@ -234,7 +254,7 @@ fun NoteDetailContent(
                 HorizontalSpacer(Spacing.sm)
 
                 Text(
-                    text = state.createdTime,
+                    text = createdAtLabel(state.note.createdAt),
                     style = AppTextStyle.Metadata,
                     color = AppTheme.colors.faint
                 )
@@ -272,7 +292,7 @@ fun NoteDetailContent(
                 ReminderBox(
                     isNext = it > System.currentTimeMillis(),
                     title = stringResource(NoteDetailR.string.notedetail_reminder_label),
-                    date = state.reminder,
+                    date = createdAtLabel(it),
                     isDetail = true,
                     onEditClick = { showReminderSheet = true }
                 )
@@ -302,7 +322,7 @@ fun NoteDetailContent(
                         innerTextField()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
             )
 
             VerticalSpacer(Spacing.lg)
@@ -346,7 +366,7 @@ fun NoteDetailContent(
             VerticalSpacer(Spacing.sm)
 
             Text(
-                text = state.editedTime,
+                text = editedLabel(state.note.updatedAt),
                 style = AppTextStyle.Metadata,
                 color = AppTheme.colors.faint
             )
@@ -362,14 +382,13 @@ fun NoteDetailContent(
                         .padding(bottom = Spacing.xxl)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            bitmap = BitmapFactory.decodeFile(state.note?.images!![showImagePreview])
-                                .asImageBitmap(),
-                            contentDescription = stringResource(NoteDetailR.string.notedetail_full_screenshot_cd),
-                            contentScale = ContentScale.Fit,
+                        AsyncImage(
+                            model = File(state.note.images[showImagePreview]),
+                            contentDescription = stringResource(NoteDetailR.string.notedetail_screenshot_cd),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(Spacing.lg)
+                                .padding(Spacing.lg),
+                            contentScale = ContentScale.Fit,
                         )
                         TextButton(
                             onClick = { showImagePreview = -1 },
@@ -404,11 +423,12 @@ fun NoteDetailContent(
                 text = { Text(stringResource(NoteDetailR.string.notedetail_exact_alarm_body)) },
                 confirmButton = {
                     TextButton(onClick = {
-                        val intent = Intent(
-                            Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                            "package:${context.packageName}".toUri()
+                        exactAlarmLauncher.launch(
+                            Intent(
+                                Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                "package:${context.packageName}".toUri()
+                            )
                         )
-                        context.startActivity(intent)
                         onIntent(NoteDetailContract.Intent.RefreshPermissionDialogVisibility)
 //                        onIntent(NoteDetailContract.Intent.SchedulePendingReminder)
                     }) {
@@ -467,7 +487,6 @@ private fun NoteDetailContentPreview() {
                     extractedData = emptyMap(),
                     images = listOf("lalalalla")
                 ),
-                createdTime = "Yesterday 05:00",
                 isLoading = false
             ),
             onIntent = {}

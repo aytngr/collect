@@ -4,10 +4,12 @@ import com.aytngr.domain.models.DataResult
 import com.aytngr.domain.models.Note
 import com.aytngr.domain.models.onSuccess
 import com.aytngr.domain.repository.NotesRepository
+import com.aytngr.domain.scheduler.ReminderScheduler
 import javax.inject.Inject
 
 class CreateNoteUseCase @Inject constructor(
     private val notesRepository: NotesRepository,
+    private val reminderScheduler: ReminderScheduler,
 ) {
     suspend operator fun invoke(
         title: String?,
@@ -31,6 +33,7 @@ class CreateNoteUseCase @Inject constructor(
             notesRepository.insertNote(note)
                 .onSuccess {
                     noteId = it
+                    reminderAt?.let{ reminder -> reminderScheduler.schedule(it, null, reminder) }
                 }
             noteId?.let {
                 val savedNote = note.copy(id = it)

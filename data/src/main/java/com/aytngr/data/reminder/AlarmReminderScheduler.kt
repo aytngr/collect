@@ -15,7 +15,7 @@ class AlarmReminderScheduler @Inject constructor(
 ) : ReminderScheduler {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    override fun schedule(noteId: Long, title: String, atMillis: Long) {
+    override fun schedule(noteId: Long, title: String?, atMillis: Long) {
         val intent = Intent(context, ReminderReceiver::class.java).apply{
             putExtra(ReminderReceiver.EXTRA_NOTE_ID, noteId)
             putExtra(ReminderReceiver.EXTRA_TITLE, title)

@@ -27,4 +27,22 @@
     <string name="reminder_sheet_ok">Tamam</string>
     <string name="reminder_sheet_cancel">Ləğv et</string>
     <string name="back_button_cd">Geri</string>
+    <string name="category_general">Ümumi</string>
+    <string name="category_shopping">Alış-veriş</string>
+    <string name="category_finance">Maliyyə</string>
+    <string name="category_work">İş</string>
+    <string name="category_saved">Əlfəcinlər</string>
+    <string name="time_today">Bu gün</string>
+    <string name="time_yesterday">Dünən</string>
+    <string name="time_just_now">İndicə</string>
+    <string name="time_minutes_short">%1$ddəq</string>
+    <string name="time_hours_short">%1$dsaat</string>
+    <string name="time_days_short">%1$dgün</string>
+    <string name="time_day_at_time">%1$s · %2$s</string>
+    <string name="time_edited_just_now">İndicə redaktə edildi</string>
+    <string name="time_edited_minutes">%1$ddəq əvvəl redaktə edildi</string>
+    <string name="time_edited_hours">%1$dsaat əvvəl redaktə edildi</string>
+    <string name="time_edited_yesterday">Dünən redaktə edildi</string>
+    <string name="time_edited_days">%1$dgün əvvəl redaktə edildi</string>
+    <string name="time_edited_on">%1$s tarixində redaktə edildi</string>
 </resources>

@@ -19,4 +19,11 @@ class PermissionHandler @Inject constructor(
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
     }
+
+    fun hasNotificationPermission(): Boolean {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            == PackageManager.PERMISSION_GRANTED
+        )
+    }
 }

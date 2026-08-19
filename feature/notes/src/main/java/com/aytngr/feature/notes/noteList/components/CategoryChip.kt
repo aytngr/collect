@@ -18,6 +18,7 @@ import com.aytngr.core.designsystem.theme.AppTheme
 import com.aytngr.core.designsystem.theme.Spacing
 import com.aytngr.domain.models.NoteCategory
 import com.aytngr.feature.notes.R
+import com.aytngr.core.ui.labelRes
 
 @Composable
 fun CategoryChip(
@@ -52,7 +53,7 @@ fun CategoryChip(
             FilterChip(
                 selected = selectedCategory == category,
                 onClick = { onCategorySelected(category) },
-                label = { (Text(category.name.lowercase().replaceFirstChar { it.uppercase() }, style = AppTextStyle.Chip)) },
+                label = { Text(stringResource(category.labelRes()), style = AppTextStyle.Chip) },
                 shape = AppShapes.extraLarge,
                 colors = FilterChipDefaults.filterChipColors(
                     labelColor = AppTheme.colors.sub,

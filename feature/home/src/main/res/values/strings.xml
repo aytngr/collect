@@ -14,4 +14,8 @@
     <string name="home_start_floating_widget">Start Floating Widget</string>
     <string name="home_recent_notes_title">Recent Notes</string>
     <string name="home_view_all">View All</string>
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <string name="home_greeting_night">Good night</string>
 </resources>

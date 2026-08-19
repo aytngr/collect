@@ -27,4 +27,22 @@
     <string name="reminder_sheet_ok">ОК</string>
     <string name="reminder_sheet_cancel">Отмена</string>
     <string name="back_button_cd">Назад</string>
+    <string name="category_general">Общее</string>
+    <string name="category_shopping">Покупки</string>
+    <string name="category_finance">Финансы</string>
+    <string name="category_work">Работа</string>
+    <string name="category_saved">Сохранённые</string>
+    <string name="time_today">Сегодня</string>
+    <string name="time_yesterday">Вчера</string>
+    <string name="time_just_now">Только что</string>
+    <string name="time_minutes_short">%1$dм</string>
+    <string name="time_hours_short">%1$dч</string>
+    <string name="time_days_short">%1$dд</string>
+    <string name="time_day_at_time">%1$s · %2$s</string>
+    <string name="time_edited_just_now">Изменено только что</string>
+    <string name="time_edited_minutes">Изменено %1$dм назад</string>
+    <string name="time_edited_hours">Изменено %1$dч назад</string>
+    <string name="time_edited_yesterday">Изменено вчера</string>
+    <string name="time_edited_days">Изменено %1$dд назад</string>
+    <string name="time_edited_on">Изменено %1$s</string>
 </resources>
