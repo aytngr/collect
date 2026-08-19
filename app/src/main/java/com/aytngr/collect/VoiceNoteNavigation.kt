@@ -24,9 +24,7 @@ import com.aytngr.feature.overlay.OverlayService
 fun VoiceNoteNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Home,
-        modifier = Modifier
-            .padding(WindowInsets.systemBars.asPaddingValues())
+        startDestination = Home
     ) {
         composable<Home> {
             HomeScreen(
